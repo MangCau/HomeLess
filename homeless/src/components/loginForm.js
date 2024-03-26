@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, FloatingLabel } from 'react-bootstrap';
+import { Form, FloatingLabel, Button } from 'react-bootstrap';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -7,13 +7,10 @@ function LoginForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here, for example:
     console.log("Email:", email);
     console.log("Password:", password);
   };
-
   return (
-    <div>
       <Form onSubmit={handleSubmit}>
         <FloatingLabel controlId="email" label="Email" className="mb-5">
           <Form.Control
@@ -21,8 +18,7 @@ function LoginForm() {
             placeholder="Nhập email của bạn"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{width:'150%'}}
-            
+
           />
         </FloatingLabel>
 
@@ -35,8 +31,11 @@ function LoginForm() {
             
           />
         </FloatingLabel>
+        <Button variant="primary" type="submit">
+          <a className='logintext'>Đăng nhập</a>
+        </Button>
       </Form>
-    </div>
+
   );
 }
 

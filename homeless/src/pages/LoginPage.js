@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import welcomeimg from '../asserts/smarthome.jpg';
 import LoginForm from '../components/loginForm';
@@ -21,7 +21,6 @@ function LoginPage() {
         </Col>
         <Col xs={6}>
             <div className='formlogin d-flex justify-content-center align-items-center h-100'>
-              <div>
                 <Navbar className="bg-body-tertiary" style={{marginBottom:'50px'}}>
                   <Container>
                     <Navbar.Brand> 
@@ -37,16 +36,9 @@ function LoginPage() {
                     </Navbar.Brand>
                   </Container>
                 </Navbar>
-              </div>
-              <div className='d-flex justify-content-center'>
                 <LoginForm/>
-              </div>
-              <Button variant="primary" type="submit">
-                <a className='logintext'>Đăng nhập</a>
-              </Button>
             </div>
         </Col>
-
       </Row>
     </Container>
   );

@@ -37,7 +37,7 @@ const Header = () => {
 
     return (
         <Stack direction="horizontal" gap={3} className="justify-content-between">
-            <div className="p-2">
+            <div className="p-0">
                 <Navbar className="bg-body-tertiary">
                     <Container>
                         <Navbar.Brand href="#"> 
