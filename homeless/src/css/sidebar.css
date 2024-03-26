@@ -1,11 +1,10 @@
 .sidebar-container {
     max-width: 300px; 
-    margin-left: 10px;
 }
 .sidebaritems {
     width: 35x;
     height: 35px;
-    margin-right: 10px;
+    margin-left: 30px;
 }
 .advertisements {
     width: 80%;

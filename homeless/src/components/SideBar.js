@@ -29,15 +29,15 @@ function Advertisement () {
 }
 export default function SideBar(){
     return (
-        <div className="sidebar-container">
-            <ButtonGroup vertical>
-                <SideBarItem img_src={dashboardImage} des="Dashboard"/>
-                <SideBarItem img_src={fanImage} des="Quạt"/>
-                <SideBarItem img_src={lightImage} des="Đèn"/>
-                <SideBarItem img_src={settingImage} des="Cài đặt"/>
-                <SideBarItem img_src={signoutImage} des="Đăng xuất"/>
+        <div className="sidebar-container mt-5">
+            <div className='col container justify-items-center'>
+                <SideBarItem img_src={dashboardImage} des="Dashboard"/><br></br>
+                <SideBarItem img_src={fanImage} des="Quạt"/><br></br>
+                <SideBarItem img_src={lightImage} des="Đèn"/><br></br>
+                <SideBarItem img_src={settingImage} des="Cài đặt"/><br></br>
+                <SideBarItem img_src={signoutImage} des="Đăng xuất"/><br></br>
                 <Advertisement/>
-            </ButtonGroup>
+            </div>
         </div>
     );
 }
