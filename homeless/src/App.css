@@ -1,0 +1,16 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+.navbar-brand a {
+    font-family: 'Roboto', sans-serif;
+}
+.custom .btn-primary {
+    background-color: rgb(255, 255, 255);
+    border-color: rgb(255, 255, 255);
+}
+.homeless{
+    font-weight: bold;
+    text-decoration: none;
+    color:black;
+    font-size: 26px;
+}
