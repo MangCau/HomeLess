@@ -29,7 +29,7 @@ function Advertisement () {
 }
 export default function SideBar(){
     return (
-        <div className="sidebar-container mt-5">
+        <div className="sidebar-container pt-5 bg-white">
             <div className='col container justify-items-center'>
                 <SideBarItem img_src={dashboardImage} des="Dashboard"/><br></br>
                 <SideBarItem img_src={fanImage} des="Quạt"/><br></br>
