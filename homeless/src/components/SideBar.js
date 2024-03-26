@@ -9,12 +9,12 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Button from 'react-bootstrap/Button';
 import '../css/sidebar.css'
 
-function SideBarItem({ img_src, des }) {
+function SideBarItem({ img_src, des, onClick }) {
     return (
-        <div className="d-flex align-items-center mb-4">
+        <Button variant="white" className="d-flex align-items-center mb-4" onClick={onClick}>
             <img src={img_src} alt="icon" className='sidebaritems'/>
             <p className="mb-0">{des}</p>
-        </div>
+        </Button>
     );
 }
 function Advertisement () {
