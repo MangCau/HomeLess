@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col} from 'react-bootstrap';
 import welcomeimg from '../asserts/smarthome.jpg';
 import LoginForm from '../components/loginForm';
 import logo from '../asserts/logo.png';

@@ -16,3 +16,18 @@ body {
     color:black;
     font-size: 26px;
 }
+.mainpage{
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.mainbody{
+    display: flex;
+    flex:1;
+}
+.maincontent{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
