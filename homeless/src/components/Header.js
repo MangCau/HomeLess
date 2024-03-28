@@ -37,8 +37,8 @@ const Header = () => {
 
     return (
         <Stack direction="horizontal" gap={3} className="justify-content-between">
-            <div className="p-0">
-                <Navbar className="bg-body-tertiary">
+            <div className="p-2">
+                <Navbar className="bg-white">
                     <Container>
                         <Navbar.Brand href="#"> 
                             <img
@@ -55,7 +55,7 @@ const Header = () => {
                 </Navbar>
             </div>
             <div className="p-2 ms-auto">
-                <Navbar className="bg-body-tertiary">
+                <Navbar className="bg-white">
                     <Container>
                         <Navbar.Brand href="#">
                             <img

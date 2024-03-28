@@ -1,5 +1,5 @@
 .sidebar-container {
-    max-width: 300px; 
+    max-width: 250px; 
 }
 .sidebaritems {
     width: 35x;
@@ -8,7 +8,7 @@
     margin-right: 10px;
 }
 .advertisements {
-    width: 80%;
+    width: 98%;
     background-color: #5D5FEF;
     color: white;
     padding: 15px 25px;
