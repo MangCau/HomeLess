@@ -25,23 +25,28 @@ def processData(client, data):
     print(splitData)
     warning = None
     distance = None
+    # Gui nhiet do len server
     if splitData[0] == "TEMP":
         client.publish("cam_bien_nhiet_do", splitData[1])
+    # Gui do am len server
     if splitData[2] == "HUMI":
         client.publish("cam_bien_do_am", splitData[3])
+    # Gui canh bao len server
     if splitData[0] == "WARN":
         warning = splitData[1]
     if splitData[2] == "DIST":
-        distance = splitData[3]
-    data_warning = None
+        distance = int(splitData[3])
     warn_send = None
-    if warning == 1 and distance < 60:
+    if warning == "1" and distance < 60:
         data_warning = "CO NGUOI"
     else:
         data_warning = "KHONG CO NGUOI"
-    if warn_send != warning:
-        warn_send = warning
+    if warn_send != data_warning:
+        warn_send = data_warning
         client.publish("canh_bao", warn_send)
+    if data_warning == "CO NGUOI":
+        client.publish("cam_bien_khoang_cach", str(distance))
+    # Gui thong bao tat quat
     if splitData[0] == "ON_FAN":
         client.publish("cong_tac_quat", splitData[1])
     if splitData[0] == "OFF_FAN":
