@@ -1,12 +1,12 @@
 import sys
 from Adafruit_IO import MQTTClient
 import time
-from uart import *
+from serial_com import *
 
 
 AIO_FEED_IDs = ["cong_tac_den", "cong_tac_quat", "mode_fan", "mode_light", "dat_nhiet_do"]
 AIO_USERNAME = "homeless_da01"
-AIO_KEY = "aio_IdNu430XxTxiNvRZLib0GnbOxyxX"
+AIO_KEY = "aio_QRRK86DPc0JmdycIJo3DNtMwf6sS"
 
 def connected(client):
     print("Ket noi thanh cong ...")
@@ -19,6 +19,7 @@ def subscribe(client , userdata , mid , granted_qos):
 
 def disconnected(client):
     print("Ngat ket noi ...")
+    writeData("disconnect_server")
     sys.exit(1)
 
 def message(client , feed_id , payload):
@@ -45,10 +46,10 @@ def message(client , feed_id , payload):
     if feed_id == "mode_fan":
         if payload == "1":
             writeData("on_mode_fan")
+            if feed_id == "dat_nhiet_do":
+                writeData(payload)
         else:
             writeData("off_mode_fan")
-    if feed_id == "dat_nhiet_do":
-        writeData(payload)
 
 
 client = MQTTClient(AIO_USERNAME , AIO_KEY)
