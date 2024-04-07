@@ -38,6 +38,9 @@ export default function Display() {
     const [numOfPeople, setNumOfPeople] = useState(null);
     const [averageTemperature, setAverageTemperature] = useState(null);
     const [averageHumidity, setAverageHumidity] = useState(null);
+    const [yesterdayAverageTemperature, setYesterdayAverageTemperature] = useState(null);
+    const [yesterdayAverageHumidity, setYesterdayAverageHumidity] = useState(null);
+    const [yesterdayNumOfPeople, setYesterdayNumOfPeople] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,6 +55,7 @@ export default function Display() {
 
                 const responseNumOfPeople = await fetch('https://io.adafruit.com/api/v2/homeless_da01/feeds/canh-bao/data?start_time=today');
                 const dataNumOfPeople = await responseNumOfPeople.json();
+                
                 
                 const countCoNguoi = dataNumOfPeople.reduce((count, dataPoint) => {
                     if (dataPoint.value === "CO NGUOI") {
@@ -76,6 +80,37 @@ export default function Display() {
                 }, 0);
                 const avgHumidity = totalHumidity / dataHumidity.length;
                 setAverageHumidity(avgHumidity.toFixed(2)); // Rounded to 2 decimal places
+
+                const responseTempYesterday = await fetch('https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-nhiet-do/data?start_time=yesterday&end_time=today');
+                const dataTempYesterday = await responseTempYesterday.json();
+
+                const totalTemperatureYesterday = dataTempYesterday.reduce((acc, dataPoint) => {
+                    return acc + parseFloat(dataPoint.value);
+                }, 0);
+                const avgTemperatureYesterday = totalTemperatureYesterday / dataTempYesterday.length;
+                setYesterdayAverageTemperature(avgTemperatureYesterday.toFixed(2));
+
+                const responseHumidityYesterday = await fetch('https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-do-am/data?start_time=yesterday&end_time=today');
+                const dataHumidityYesterday = await responseHumidityYesterday.json();
+
+                const totalHumidityYesterday = dataHumidityYesterday.reduce((acc, dataPoint) => {
+                    return acc + parseFloat(dataPoint.value);
+                }, 0);
+                const avgHumidityYesterday = totalHumidityYesterday / dataHumidityYesterday.length;
+                setYesterdayAverageHumidity(avgHumidityYesterday.toFixed(2));
+
+                const responseNumOfPeopleYesterday = await fetch('https://io.adafruit.com/api/v2/homeless_da01/feeds/canh-bao/data?start_time=yesterday&end_time=today');
+                const dataNumOfPeopleYesterday = await responseNumOfPeopleYesterday.json();
+
+                const countCoNguoiYesterday = dataNumOfPeopleYesterday.reduce((count, dataPoint) => {
+                    if (dataPoint.value === "CO NGUOI") {
+                        return count + 1;
+                    }
+                    return count;
+                }, 0);
+
+                setYesterdayNumOfPeople(countCoNguoiYesterday);
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -87,6 +122,16 @@ export default function Display() {
 
         return () => clearInterval(intervalId);
     }, []);
+
+    let temperatureDiffPercent = ((averageTemperature - yesterdayAverageTemperature) / yesterdayAverageTemperature * 100).toFixed(2);
+    if (yesterdayAverageTemperature === null) {
+        temperatureDiffPercent = "100.00";
+    }
+
+    let humidityDiffPercent = ((averageHumidity - yesterdayAverageHumidity) / yesterdayAverageHumidity * 100).toFixed(2);
+    if (yesterdayAverageHumidity === null) {
+        humidityDiffPercent = "100.00";
+    }
 
     return (
         <div className="mt-5 m-4 bg-white p-4 pb-0">
@@ -100,9 +145,9 @@ export default function Display() {
                 </Button>
             </div>
             <div className="d-flex justify-content-space-around align-items-center">
-                <SmallItems type={0} color="#FFF4DE" value={temperature} medium={averageTemperature} diff="+10%" />
-                <SmallItems type={1} color="#DCFCE7" value={humidity} medium={averageHumidity} diff="+10%" />
-                <SmallItems type={2} color="#F3E8FF" value={numOfPeople} medium="10" diff="-2" />
+                <SmallItems type={0} color="#FFF4DE" value={temperature} medium={averageTemperature} diff={`${temperatureDiffPercent}%`} />
+                <SmallItems type={1} color="#DCFCE7" value={humidity} medium={averageHumidity} diff={`${humidityDiffPercent}%`} />
+                <SmallItems type={2} color="#F3E8FF" value={numOfPeople} medium="10" diff={numOfPeople-yesterdayNumOfPeople} />
             </div>
         </div>
     );
