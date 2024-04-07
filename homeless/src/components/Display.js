@@ -17,7 +17,7 @@ function SmallItems({ type, color, value, medium, diff }) {
             break;
         case 2:
             str = value;
-            str_1 = "Người";
+            str_1 = "Lượt xuất hiện người";
             break;
         default:
             str = "Invalid type";
