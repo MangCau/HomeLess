@@ -99,17 +99,17 @@ export default function Display() {
                 const avgHumidityYesterday = totalHumidityYesterday / dataHumidityYesterday.length;
                 setYesterdayAverageHumidity(avgHumidityYesterday.toFixed(2));
 
-                const responseNumOfPeopleYesterday = await fetch('https://io.adafruit.com/api/v2/homeless_da01/feeds/canh-bao/data?start_time=yesterday&end_time=today');
-                const dataNumOfPeopleYesterday = await responseNumOfPeopleYesterday.json();
+                // const responseNumOfPeopleYesterday = await fetch('https://io.adafruit.com/api/v2/homeless_da01/feeds/canh-bao/data?start_time=yesterday&end_time=today');
+                // const dataNumOfPeopleYesterday = await responseNumOfPeopleYesterday.json();
 
-                const countCoNguoiYesterday = dataNumOfPeopleYesterday.reduce((count, dataPoint) => {
-                    if (dataPoint.value === "CO NGUOI") {
-                        return count + 1;
-                    }
-                    return count;
-                }, 0);
+                // const countCoNguoiYesterday = dataNumOfPeopleYesterday.reduce((count, dataPoint) => {
+                //     if (dataPoint.value === "CO NGUOI") {
+                //         return count + 1;
+                //     }
+                //     return count;
+                // }, 0);
 
-                setYesterdayNumOfPeople(countCoNguoiYesterday);
+                // setYesterdayNumOfPeople(countCoNguoiYesterday);
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -147,7 +147,7 @@ export default function Display() {
             <div className="d-flex justify-content-space-around align-items-center">
                 <SmallItems type={0} color="#FFF4DE" value={temperature} medium={averageTemperature} diff={`${temperatureDiffPercent}%`} />
                 <SmallItems type={1} color="#DCFCE7" value={humidity} medium={averageHumidity} diff={`${humidityDiffPercent}%`} />
-                <SmallItems type={2} color="#F3E8FF" value={numOfPeople} medium="10" diff={numOfPeople-yesterdayNumOfPeople} />
+                <SmallItems type={2} color="#F3E8FF" value={numOfPeople} medium="10" diff="2" />
             </div>
         </div>
     );
