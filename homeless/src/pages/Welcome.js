@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
 import { Container, Row, Col, Form, FloatingLabel, Button} from 'react-bootstrap';
 import welcomeimg from '../asserts/smarthome.jpg';
-// import LoginForm from '../components/loginForm';
 import logo from '../asserts/logo.png';
 import Navbar from 'react-bootstrap/Navbar';
 import '../css/LoginPage.css';
 
-function LoginPage() {
+function WelcomePage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -40,27 +39,25 @@ function LoginPage() {
                         className="d-inline-block align-center"
                       /> 
                       {' '}
-                      <a className='homeless'>HomeLess</a>
+                      <span className='homeless'>HomeLess</span>
                     </Navbar.Brand>
                   </Container>
                 </Navbar>
                 <Form onSubmit={handleSubmit}>
-                  <FloatingLabel controlId="email" label="Email" className="mb-5">
+                  <FloatingLabel label="Email" className="mb-5">
                     <Form.Control
                       type="email"
-                      placeholder="Nhập email của bạn"
-                      id='email'
+                      placeholder="Email"
+                      id='emaillogin'
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-
                     />
                   </FloatingLabel>
-
-                  <FloatingLabel controlId="pass" label="Mật khẩu">
+                  <FloatingLabel  label="Mật khẩu">
                     <Form.Control
                       type="password"
                       placeholder="Mật khẩu"
-                      id='password'
+                      id='passwordlogin'
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       
@@ -70,6 +67,7 @@ function LoginPage() {
                     <a className='logintext'>Đăng nhập</a>
                   </Button>
                 </Form>
+                <a href='/signup' style={{color:'#5D5FEF', marginTop:'20px'}}>Đăng ký</a>
             </div>
         </Col>
       </Row>
@@ -77,4 +75,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default WelcomePage;
