@@ -49,7 +49,7 @@ const Header = () => {
                                 className="d-inline-block align-center"
                             /> 
                             {' '}
-                            <a className='homeless'>HomeLess</a>
+                            <span className='homeless'>HomeLess</span>
                         </Navbar.Brand>
                     </Container>
                 </Navbar>
@@ -66,7 +66,7 @@ const Header = () => {
                                 className="d-inline-block align-center"
                             />
                             {' '}
-                            <a>ChaNa</a>
+                            ChaNa
                         </Navbar.Brand>
                     </Container>
                 </Navbar>
