@@ -17,8 +17,44 @@ export default function LightController () {
         const fetchData = async () => {
             try {
                 const lastRecordStatus = await api.get("/api/light/"); 
-                console.log(lastRecordStatus.data['status'])
                 setStatus(lastRecordStatus.data['status']);
+                
+                const scheduleResponse = await api.get("/api/schedule");
+                const schedules = scheduleResponse.data;
+                // const currentTime = new Date();
+                // const currentHour = currentTime.getHours();
+                // const currentMinute = currentTime.getMinutes();
+                // schedules.forEach(async (schedule) => {
+                //     const { start_time, end_time } = schedule;
+                    
+                //     // Split the start and end times into hours and minutes
+                //     const startTimeParts = start_time.split(":");
+                //     const startHour = parseInt(startTimeParts[0]);
+                //     const startMinute = parseInt(startTimeParts[1]);
+                    
+                //     const endTimeParts = end_time.split(":");
+                //     const endHour = parseInt(endTimeParts[0]);
+                //     const endMinute = parseInt(endTimeParts[1]);
+                //     console.log(currentHour);
+                //     console.log(currentMinute)
+                //     const { v4: uuidv4 } = require('uuid'); 
+                //     if (
+                //         (currentHour > startHour || (currentHour === startHour && currentMinute >= startMinute)) &&
+                //         (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute))
+                //     ) {
+                //         await api.post('/api/activity-log/', {
+                //             id: uuidv4(),
+                //             type: 'light',
+                //             status: true
+                //           });
+                //     } else {
+                //         await api.post('/api/activity-log/', {
+                //             id: uuidv4(),
+                //             type: 'light',
+                //             status: false
+                //           });
+                //     }
+                // });
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -44,24 +80,34 @@ export default function LightController () {
             type: 'light',
             status: !status
           });
-          console.log(activityResponse.data);
         } catch (error) {
           console.error('Error toggling status:', error);
         }
       };
 
-    const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
         const ontime = document.getElementById('ontime').value;
         const offtime = document.getElementById('offtime').value;
         const selectedOption = loopOption;
         const selectedDay = loopOption === 'oneday' ? document.getElementById('onedayselect').value : '';
-        console.log('On time:', ontime);
-        console.log('Off time:', offtime);
-        console.log('Selected option:', selectedOption);
-        console.log('Selected day:', selectedDay);
-        setShowModal(false);
-      };
+        const data = {
+            start_time: ontime,
+            end_time: offtime,
+            everyday: selectedOption === 'everyday',
+        };
+    
+        // if (selectedOption === 'oneday') {
+        //     data['selected_day'] = selectedDay;
+        // }
+    
+        try {
+            const response = await api.post('/api/schedule/', data);
+            console.log(response);
+        } catch (error) {
+            console.error('Error adding schedule:', error);
+        }
+    };
     
     return (
         <div className='mainpage'>

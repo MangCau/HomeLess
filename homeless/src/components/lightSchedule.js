@@ -1,13 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Modal, Button, Form, FormCheck } from "react-bootstrap";
+import api from '../api'
 
 export default function LightSchedule() {
+    const [schedule, setSchedule] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [loopOption, setLoopOption] = useState();
     const [selectedDate, setSelectedDate] = useState();
     const [showAll, setShowAll] = useState(false);
     const [clickedSchedule, setClickedSchedule] = useState(null);
     
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const schedule = await api.get("/api/schedule/"); 
+                setSchedule(schedule.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []); 
+
 
     const handleOptionChange = (e) => {
         setLoopOption(e.target.value);
@@ -19,50 +33,8 @@ export default function LightSchedule() {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const ontime = document.getElementById('ontime').value;
-        const offtime = document.getElementById('offtime').value;
-        const selectedOption = loopOption;
-        const selectedDay = loopOption === 'oneday' ? document.getElementById('onedayselect').value : '';
-    
-        // Prepare the data to send in the request body
-        const data = {
-            start_time: ontime,
-            end_time: offtime,
-            everyday: selectedOption === 'everyday',
-        };
-    
-        // If the selected option is 'oneday', include the selected day in the data
-        if (selectedOption === 'oneday') {
-            data['selected_day'] = selectedDay;
-        }
-    
-        try {
-            // Send a POST request to the API endpoint
-            const response = await fetch('/api/schedule/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-    
-            // Check if the request was successful
-            if (response.ok) {
-                // Schedule added successfully
-                console.log('Schedule added successfully');
-                setShowModal(false);
-                // Optionally, you can perform additional actions here
-            } else {
-                // Handle errors if the request fails
-                console.error('Failed to add schedule:', response.statusText);
-                // Optionally, you can display an error message to the user
-            }
-        } catch (error) {
-            console.error('Error adding schedule:', error);
-            // Optionally, you can display an error message to the user
-        }
     };
+    
 
     const handleEdit = (schedule) => {
         setClickedSchedule(schedule);
@@ -78,8 +50,7 @@ export default function LightSchedule() {
     };
     
 
-    const schedules = [
-    ];
+    const schedules = schedule;
 
     const visibleSchedules = showAll ? schedules : schedules.slice(0, 5); // Show all schedules if showAll is true, otherwise show only first 5
 
@@ -89,20 +60,20 @@ export default function LightSchedule() {
                 <Col xs={12} className="d-flex justify-content-center">
                     <h2 className='thresholdtitle mb-4 mt-5'>THỜI GIAN BIỂU TỰ ĐỘNG</h2>
                 </Col>
-                {visibleSchedules.map((schedule, index) => (
+                {Array.isArray(visibleSchedules) && visibleSchedules.map((object, index) => (
                     <Col key={index} xs={12} style={{ border: '1px solid #ced4da', borderRadius: '10px', padding: '20px', marginBottom: '20px' }}>
                         <Row>
                             <Col xs={12} className="d-flex justify-content-center mb-3">
-                                <a style={{ color: '#5D5FEF', fontWeight: 'bold', fontSize: '16px' }}>- {schedule.loops} - {schedule.date}</a>
+                                <a style={{ color: '#5D5FEF', fontWeight: 'bold', fontSize: '16px' }}>{object.everyday ? 'Everyday' : 'Oneday'}</a>
                             </Col>
                             <Col xs={12}>
                                 <Row>
                                     <Col xs={4} className="align-items-center justify-content-center">
                                         <div className="text-center mb-3">
-                                            <p>{schedule.timeons}</p>
+                                            <p>{object.start_time}</p>
                                         </div>
                                         <div className="text-center">
-                                            <p>{schedule.timeoffs}</p>
+                                            <p>{object.end_time}</p>
                                         </div>
                                     </Col>
                                     <Col xs={4}>
