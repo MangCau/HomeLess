@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import {Col, Row, Image, Modal, Form, Button, Container} from 'react-bootstrap';
 import thresholdimg from '../asserts/threshold.png';
 import api from '../api'
+
+const apiKey = "aio_FRcK28kFx9ylh9C7M8ArFVvbCDFc"; // Replace with your Adafruit IO API key
+
 export default function Threshold () {
     const [showModal, setShowModal] = useState(false);
     const [newDegree, setNewDegree] = useState('');
@@ -30,6 +33,17 @@ export default function Threshold () {
         const parsedDegree = parseInt(newDegree);
         if (parsedDegree >= 20 && parsedDegree <= 50) {
             const response = await api.patch('/api/fan/', { threshold: parsedDegree });
+            const data = {
+                value: parsedDegree,
+              };
+              await fetch(`https://io.adafruit.com/api/v2/homeless_da01/feeds/dat-nhiet-do/data`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "X-AIO-Key": apiKey,
+                },
+                body: JSON.stringify(data),
+              });
             console.log(response.data);
             setDegree(parsedDegree);
             setShowModal(false);

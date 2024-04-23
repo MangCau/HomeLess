@@ -45,6 +45,7 @@ export default function Display() {
                 const latestTemp = await api.get("/api/temperature-record/latest/"); 
                 const latestHumidity = await api.get("/api/humidity-record/latest/");
                 const detect_human = await api.get("/api/human-detect-record/latest/");
+                console.log(detect_human);
                 setTemperature(latestTemp.data);
                 setHumidity(latestHumidity.data);
                 setDetect_human(detect_human.data);
@@ -53,7 +54,7 @@ export default function Display() {
             }
         };
         fetchData();
-        const intervalId = setInterval(fetchData, 5000);
+        const intervalId = setInterval(fetchData, 1000);
         return () => clearInterval(intervalId);
     }, []); 
 

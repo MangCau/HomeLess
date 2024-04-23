@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import api from '../api';
 
+const apiKey = "aio_FRcK28kFx9ylh9C7M8ArFVvbCDFc"; // Replace with your Adafruit IO API key
+
 const OnOffFan = () => {
   const [status, setStatus] = useState('');
   const [modeA, setModeA] = useState('');
@@ -9,37 +11,48 @@ const OnOffFan = () => {
   useEffect(() => {
     const fetchData = async () => {
         try {
+            await api.get("/api/activity-log/")
             const lastRecordStatus = await api.get("/api/fan/"); 
-            setStatus(lastRecordStatus.data['status']);
-            setModeA(lastRecordStatus.data['is_manual']);
-            if (modeA) {
-                const latestTemp = await api.get("/api/temperature-record/latest/"); 
-                const temperature = latestTemp.data;
-
-                const thresholdResponse = await api.get("/api/fan/"); 
-                const threshold = thresholdResponse.data['threshold'];
-                const { v4: uuidv4 } = require('uuid');
-                if (temperature < threshold && !status) {
-                  await api.post('/api/activity-log/', {
-                    id: uuidv4(),
-                    type: 'fan',
-                    status: true
+            if (status !== '')
+            {
+              // console.log('Fan ' + lastRecordStatus.data.status)
+              // console.log('Status before ' + status)
+              if (status !== lastRecordStatus.data.status) {
+                try {
+                  const value = lastRecordStatus.data.status ? 1 : 0;
+                  const data = {
+                    value: value,
+                  };
+                  const response = await fetch(`https://io.adafruit.com/api/v2/homeless_da01/feeds/cong-tac-quat/data`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "X-AIO-Key": apiKey,
+                    },
+                    body: JSON.stringify(data),
                   });
-                } else if (temperature >= threshold && status) {
-                  await api.post('/api/activity-log/', {
-                    id: uuidv4(),
-                    type: 'fan',
-                    status: false
-                  });
+              
+                  if (response.ok) {
+                    console.log("Data updated successfully");
+                  } else {
+                    console.error("Failed to update data:", response.statusText);
+                  }
+                } catch (error) {
+                  console.error("Error updating data:", error);
                 }
+              }
             }
+
+            setStatus(lastRecordStatus.data['status']);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
+        
+        
     };
 
     fetchData();
-    const intervalId = setInterval(fetchData, 5000);
+    const intervalId = setInterval(fetchData, 10000);
     return () => clearInterval(intervalId);
   }, [status]);
 
@@ -61,6 +74,19 @@ const OnOffFan = () => {
     try {
       const response = await api.patch('/api/fan/', { is_manual: !modeA });
       console.log(response.data);
+      setModeA(!modeA)
+      const value = !modeA ? 1 : 0;
+      const data = {
+        value: value,
+      };
+      await fetch(`https://io.adafruit.com/api/v2/homeless_da01/feeds/mode-fan/data`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-AIO-Key": apiKey,
+        },
+        body: JSON.stringify(data),
+      });
     } catch (error) {
       console.error('Error toggling modeA:', error);
     }
