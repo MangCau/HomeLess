@@ -1,10 +1,11 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import LightImg from '../asserts/Đèn.jpg';
 import ActivityHistory from '../components/activityHistory';
 import LightSchedule from "../components/lightSchedule";
+import api from '../api'
 
 export default function LightController () {
     const [status, setStatus] = useState(false);
@@ -12,6 +13,21 @@ export default function LightController () {
     const [loopOption, setLoopOption] = useState('everyday');
     const [selectedDate, setSelectedDate] = useState('');
     
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const lastRecordStatus = await api.get("/api/light/"); 
+                console.log(lastRecordStatus.data['status'])
+                setStatus(lastRecordStatus.data['status']);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+        const intervalId = setInterval(fetchData, 5000);
+        return () => clearInterval(intervalId);
+    }, []); 
+
     const handleOptionChange = (e) => {
         setLoopOption(e.target.value);
         setSelectedDate('');
@@ -20,10 +36,19 @@ export default function LightController () {
         setSelectedDate(e.target.value);
     };
 
-    const handleStatusChange = () => {
-        setStatus(!status);
-        console.log('Status:', !status);
-    };
+    const handleStatusChange = async () => {
+        try {
+          const { v4: uuidv4 } = require('uuid');
+          const activityResponse = await api.post('/api/activity-log/', {
+            id: uuidv4(),
+            type: 'light',
+            status: !status
+          });
+          console.log(activityResponse.data);
+        } catch (error) {
+          console.error('Error toggling status:', error);
+        }
+      };
 
     const handleSubmit = (e) => {
         e.preventDefault();

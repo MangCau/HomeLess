@@ -3,39 +3,53 @@ import { Container, Form } from 'react-bootstrap';
 import api from '../api';
 
 const OnOffFan = () => {
-  // State for status
   const [status, setStatus] = useState('');
-  
-  // State for mode A
   const [modeA, setModeA] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const status = await api.get("/api/activity-log/"); 
-            setStatus(status);
-            console.log(status.data);
+            const lastRecordStatus = await api.get("/api/fan/"); 
+            setStatus(lastRecordStatus.data['status']);
+            setModeA(lastRecordStatus.data['is_manual']);
+            if (modeA) {
+                const latestTemp = await api.get("/api/temperature-record/latest/"); 
+                const temperature = latestTemp.data;
 
+                const thresholdResponse = await api.get("/api/fan/"); 
+                const threshold = thresholdResponse.data['threshold'];
+                const { v4: uuidv4 } = require('uuid');
+                if (temperature < threshold && !status) {
+                  await api.post('/api/activity-log/', {
+                    id: uuidv4(),
+                    type: 'fan',
+                    status: true
+                  });
+                } else if (temperature >= threshold && status) {
+                  await api.post('/api/activity-log/', {
+                    id: uuidv4(),
+                    type: 'fan',
+                    status: false
+                  });
+                }
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
 
     fetchData();
-
-    const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
-
+    const intervalId = setInterval(fetchData, 5000);
     return () => clearInterval(intervalId);
-}, []); 
+  }, [status]);
 
   const handleStatusChange = async () => {
     try {
-      setStatus(!status);
-      // Update the activity log
+      const { v4: uuidv4 } = require('uuid');
       const activityResponse = await api.post('/api/activity-log/', {
+        id: uuidv4(),
         type: 'fan',
-        status: false,
-        is_auto: false
+        status: !status
       });
       console.log(activityResponse.data);
     } catch (error) {
@@ -45,8 +59,6 @@ const OnOffFan = () => {
 
   const handleModeAChange = async () => {
     try {
-      setModeA(!modeA);
-
       const response = await api.patch('/api/fan/', { is_manual: !modeA });
       console.log(response.data);
     } catch (error) {

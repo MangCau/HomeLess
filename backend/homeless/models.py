@@ -19,14 +19,18 @@ class Fan(models.Model):
         return f"Fan"
     
 class Schedule(models.Model):
+    id = models.AutoField(primary_key=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
+    everyday = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.start_time} - {self.end_time}"
+        if self.everyday:
+            return f"Everyday: {self.start_time} - {self.end_time}"
+        else:
+            return f"{self.start_time} - {self.end_time}"
 
 class Light(models.Model):
-    is_manual = models.BooleanField(default=False)
     status = models.BooleanField(default=False)
     schedules = models.ManyToManyField(Schedule, related_name='lights')
     
@@ -35,6 +39,7 @@ class Light(models.Model):
         return f"Light"
 
 class ActivityLog(models.Model):
+    id = models.CharField(primary_key=True, max_length=50, default="1")
     TYPE_CHOICES = (
         ('fan', 'Fan'),
         ('light', 'Light'),
@@ -43,7 +48,7 @@ class ActivityLog(models.Model):
     type = models.CharField(max_length=5, choices=TYPE_CHOICES)
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
-    is_auto = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.type}: {self.timestamp}"
+        return f"{self.type}: {'on' if self.status else 'off'} {self.timestamp}"
+    

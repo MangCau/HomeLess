@@ -5,24 +5,24 @@ from rest_framework.views import APIView
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import SensorRecord, Light, Fan, ActivityLog
-from .serializers import SensorRecordSerializer, LightSerializer, FanSerializer, ActivityLogSerializer
+from .models import SensorRecord, Light, Fan, ActivityLog, Schedule
+from .serializers import SensorRecordSerializer, LightSerializer, FanSerializer, ActivityLogSerializer, ScheduleSerializer
 
-class TemperatureRecordAPIView(APIView):
+class LatestTemperature(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         latest_record = SensorRecord.objects.filter(sensor='cam-bien-nhiet-do').latest('timestamp')
         serializer = SensorRecordSerializer(latest_record)
         return Response(serializer.data['value'])
 
-class HumidityRecordAPIView(APIView):
+class LatestHumidity(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         latest_record = SensorRecord.objects.filter(sensor='cam-bien-do-am').latest('timestamp')
         serializer = SensorRecordSerializer(latest_record)
         return Response(serializer.data['value'])
 
-class HumanDetectRecordAPIView(APIView):
+class LatestHumanDetect(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         latest_record = SensorRecord.objects.filter(sensor='canh-bao').latest('timestamp')
@@ -49,7 +49,10 @@ class SensorRecordView(APIView):
                 # Create a Record for each data point
                 for data in sensor_data:
                     if not SensorRecord.objects.filter(id=data['id']).exists():
-                        value = 1 if data['value'] == "CO NGUOI" else 0
+                        if data['feed_key'] == "canh-bao":
+                            value = 1 if data['value'] == "CO NGUOI" else 0
+                        else:
+                            value = data['value']
                         timestamp = data['created_at']
                         timestamp = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
                         SensorRecord.objects.create(id=data['id'],sensor=data['feed_key'], value=value, timestamp=timestamp)
@@ -62,8 +65,13 @@ class SensorRecordView(APIView):
 class LightView(APIView):
     permission_classes = [AllowAny]
     def get(self, request, format=None):
+        latest_light_log = ActivityLog.objects.filter(type='light').latest('timestamp')
         light = Light.objects.first() 
+        serializer = FanSerializer(latest_light_log)
+        light.status = latest_light_log.status
+        light.save()
         serializer = LightSerializer(light)
+
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -76,42 +84,87 @@ class LightView(APIView):
 class FanView(APIView):
     permission_classes = [AllowAny]
     def get(self, request, format=None):
-        fan = Fan.objects.first() 
-        serializer = FanSerializer(fan)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):   
-        fan = Fan.objects.first()  
-        fan.status = request.data.get('status', fan.status)
+        # Get the latest activity log for the fan
+        latest_fan_log = ActivityLog.objects.filter(type='fan').latest('timestamp')
+        fan = Fan.objects.first()
+        serializer = FanSerializer(latest_fan_log)
+        fan.status = latest_fan_log.status
         fan.save()
         serializer = FanSerializer(fan)
         return Response(serializer.data)
     
     def patch(self, request, format=None):
         fan = Fan.objects.first()
-        fan.is_manual = request.data.get('is_manual', fan.is_manual)
+        is_manual = request.data.get('is_manual', fan.is_manual)
+        if is_manual is not None:
+            fan.is_manual = is_manual
+        threshold = request.data.get('threshold')
+        if threshold is not None:
+            fan.threshold = threshold
         fan.save()
         serializer = FanSerializer(fan)
         return Response(serializer.data)
     
-class ActivityLogListCreateView(generics.ListCreateAPIView):
-    queryset = ActivityLog.objects.all()
-    serializer_class = ActivityLogSerializer
+class ActivityLogView(APIView):
     permission_classes = [AllowAny]
-    def get(self, request, format=None):
-        latest_fan_log = ActivityLog.objects.filter(type='fan').latest('timestamp')
 
-        latest_light_log = ActivityLog.objects.filter(type='light').latest('timestamp')
+    def get(self, request):
+        # Define the URLs for fetching switch data
+        urls = [
+            "https://io.adafruit.com/api/v2/homeless_da01/feeds/cong-tac-den/data",
+            "https://io.adafruit.com/api/v2/homeless_da01/feeds/cong-tac-quat/data",
+        ]
 
-        response_data = {
-            'fan_status': latest_fan_log.status,
-            'light_status': latest_light_log.status
-        }
+        for url in urls:
+            response = requests.get(url)
+            if response.status_code == 200:
+                switch_data = response.json()
 
-        return Response(response_data)
+                # Create a log entry for each data point
+                for data in switch_data:
+                    # Check if an entry with the same id exists
+                    if not ActivityLog.objects.filter(id=data['id']).exists():
+                        # Determine the type based on the feed_key
+                        if "cong-tac-den" in data['feed_key']:
+                            log_type = "light"
+                        elif "cong-tac-quat" in data['feed_key']:
+                            log_type = "fan"
+                        else:
+                            continue  # Skip if it's neither light nor fan
 
+                        # Determine the status based on the value
+                        status = data['value'] == "1"
+
+                        # Extract timestamp
+                        timestamp = datetime.strptime(data['created_at'], "%Y-%m-%dT%H:%M:%SZ")
+
+                        # Create ActivityLog entry
+                        ActivityLog.objects.create(id=data['id'], type=log_type, timestamp=timestamp, status=status)
+            else:
+                return JsonResponse({'error': f'Failed to fetch switch data from {url}'}, status=500)
+
+        return JsonResponse({'message': 'Switch data updated successfully'}, status=200)
+    
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        id = request.data.get('id')
+        status = request.data.get('status')
+        timestamp = datetime.now()
+        type = request.data.get('type')
+        # Create the ActivityLog entry
+        ActivityLog.objects.create(id=id, type=type, timestamp=timestamp, status=status)
+
+        return Response({'message': 'Activity log created successfully'})
+    
+class ScheduleView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, format=None):
+        schedules = Schedule.objects.all()
+        serializer = ScheduleSerializer(schedules, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ScheduleSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

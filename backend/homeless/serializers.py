@@ -6,10 +6,16 @@ class SensorRecordSerializer(serializers.ModelSerializer):
         model = SensorRecord
         fields = ['id', 'sensor', 'value', 'timestamp']
 
+class ScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Schedule
+        fields = ['id', 'start_time', 'end_time', 'everyday']
+
 class LightSerializer(serializers.ModelSerializer):
+    schedules = ScheduleSerializer(many=True)
     class Meta:
         model = Light
-        fields = ['is_manual', 'status', 'schedules']
+        fields = ['status', 'schedules']
 
 class FanSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,4 +25,4 @@ class FanSerializer(serializers.ModelSerializer):
 class ActivityLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityLog
-        fields = ['type', 'timestamp', 'status', 'is_auto']
+        fields = ['id', 'type', 'timestamp', 'status']

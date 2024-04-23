@@ -41,23 +41,19 @@ export default function Display() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const latestTemp = await api.get("/api/temperature-record/"); 
-                const latestHumidity = await api.get("/api/humidity-record/");
-                const detect_human = await api.get("/api/human-detect-record/");
+                await api.get("/api/record");
+                const latestTemp = await api.get("/api/temperature-record/latest/"); 
+                const latestHumidity = await api.get("/api/humidity-record/latest/");
+                const detect_human = await api.get("/api/human-detect-record/latest/");
                 setTemperature(latestTemp.data);
                 setHumidity(latestHumidity.data);
                 setDetect_human(detect_human.data);
-                console.log(detect_human.data);
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
-
         fetchData();
-
-        const intervalId = setInterval(fetchData, 5000); // Fetch data every 5 seconds
-
+        const intervalId = setInterval(fetchData, 5000);
         return () => clearInterval(intervalId);
     }, []); 
 

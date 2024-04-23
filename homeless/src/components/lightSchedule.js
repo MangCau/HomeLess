@@ -18,17 +18,50 @@ export default function LightSchedule() {
         setSelectedDate(e.target.value);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const ontime = document.getElementById('ontime').value;
         const offtime = document.getElementById('offtime').value;
         const selectedOption = loopOption;
         const selectedDay = loopOption === 'oneday' ? document.getElementById('onedayselect').value : '';
-        console.log('On time:', ontime);
-        console.log('Off time:', offtime);
-        console.log('Selected option:', selectedOption);
-        console.log('Selected day:', selectedDay);
-        setShowModal(false);
+    
+        // Prepare the data to send in the request body
+        const data = {
+            start_time: ontime,
+            end_time: offtime,
+            everyday: selectedOption === 'everyday',
+        };
+    
+        // If the selected option is 'oneday', include the selected day in the data
+        if (selectedOption === 'oneday') {
+            data['selected_day'] = selectedDay;
+        }
+    
+        try {
+            // Send a POST request to the API endpoint
+            const response = await fetch('/api/schedule/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+    
+            // Check if the request was successful
+            if (response.ok) {
+                // Schedule added successfully
+                console.log('Schedule added successfully');
+                setShowModal(false);
+                // Optionally, you can perform additional actions here
+            } else {
+                // Handle errors if the request fails
+                console.error('Failed to add schedule:', response.statusText);
+                // Optionally, you can display an error message to the user
+            }
+        } catch (error) {
+            console.error('Error adding schedule:', error);
+            // Optionally, you can display an error message to the user
+        }
     };
 
     const handleEdit = (schedule) => {
@@ -46,30 +79,6 @@ export default function LightSchedule() {
     
 
     const schedules = [
-        {
-            loops: 'MỖI NGÀY',
-            timeons: '09:00:12',
-            timeoffs: '13:00:00',
-            date: '',
-        },
-        {
-            loops: 'MỖI NGÀY',
-            timeons: '09:00:12',
-            timeoffs: '13:00:00',
-            date: '',
-        },
-        {
-            loops: 'MỖI NGÀY',
-            timeons: '09:00:12',
-            timeoffs: '13:00:00',
-            date: '',
-        },{
-            loops: 'MỘT NGÀY',
-            timeons: '09:00:12',
-            timeoffs: '13:00:00',
-            date: '09/28/2024',
-        },
-        // Add more schedules here if needed
     ];
 
     const visibleSchedules = showAll ? schedules : schedules.slice(0, 5); // Show all schedules if showAll is true, otherwise show only first 5

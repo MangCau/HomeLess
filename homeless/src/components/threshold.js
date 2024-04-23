@@ -1,21 +1,36 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import {Col, Row, Image, Modal, Form, Button, Container} from 'react-bootstrap';
 import thresholdimg from '../asserts/threshold.png';
-
+import api from '../api'
 export default function Threshold () {
     const [showModal, setShowModal] = useState(false);
     const [newDegree, setNewDegree] = useState('');
-    const [degree, setDegree] = useState(30); // Initial degree value
+    const [degree, setDegree] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchThreshold = async () => {
+            try {
+                const response = await api.get('/api/fan/');
+                setDegree(response.data.threshold);
+            } catch (error) {
+                console.error('Error fetching threshold:', error);
+            }
+        };
+
+        fetchThreshold();
+    }, []);
 
     const handleInputChange = (event) => {
         setNewDegree(event.target.value);
     };
     
-    const handleSave = (event) => {
+    const handleSave = async (event) => {
         event.preventDefault();
         const parsedDegree = parseInt(newDegree);
         if (parsedDegree >= 20 && parsedDegree <= 50) {
+            const response = await api.patch('/api/fan/', { threshold: parsedDegree });
+            console.log(response.data);
             setDegree(parsedDegree);
             setShowModal(false);
             setError('');
