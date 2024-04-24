@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import {Col, Row, Image, Modal, Form, Button, Container} from 'react-bootstrap';
 import thresholdimg from '../asserts/threshold.png';
 import api from '../api'
-
-const apiKey = "aio_FRcK28kFx9ylh9C7M8ArFVvbCDFc"; // Replace with your Adafruit IO API key
-
+import {apiKey} from '../constants'
 export default function Threshold () {
     const [showModal, setShowModal] = useState(false);
     const [newDegree, setNewDegree] = useState('');
