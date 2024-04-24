@@ -19,4 +19,4 @@ const DropdownComponent = ({ notifications }) => {
     );
 };
 
-export default DropdownComponent;
+export default DropdownComponent; 

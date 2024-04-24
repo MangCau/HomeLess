@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import api from '../api';
-
-const apiKey = "aio_FRcK28kFx9ylh9C7M8ArFVvbCDFc"; // Replace with your Adafruit IO API key
+import { apiKey } from '../constants';
 
 const OnOffFan = () => {
   const [status, setStatus] = useState('');
@@ -13,8 +12,7 @@ const OnOffFan = () => {
         try {
             await api.get("/api/activity-log/")
             const lastRecordStatus = await api.get("/api/fan/"); 
-            if (status !== '')
-            {
+            if (status !== '') {
               // console.log('Fan ' + lastRecordStatus.data.status)
               // console.log('Status before ' + status)
               if (status !== lastRecordStatus.data.status) {

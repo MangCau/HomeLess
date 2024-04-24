@@ -12,8 +12,7 @@ import LightController from './pages/LightController';
 import ProtectedRoute from "./components/ProtectedRoute"
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
-
-function Logout() {
+  function Logout() {
   localStorage.clear()
   return <Navigate to="/login" />
 }
