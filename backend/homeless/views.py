@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import SensorRecord, Light, Fan, FanLog, LightLog, Schedule, FanAutoLog, FanThresholdLog
 from .serializers import SensorRecordSerializer, LightSerializer, FanSerializer, FanLogSerializer, LightLogSerializer, ScheduleSerializer, FanAutoLogSerializer, FanThresholdLogSerializer
 
-io_key = "aio_UOcP45HCpzWj0lRJ0oITqy6aDzwd" 
+io_key = "aio_xYUK42K323uMXE3gfamwQCGw1nTB" 
 
 class LatestTemperature(APIView):
     permission_classes = [AllowAny]
@@ -76,12 +76,30 @@ class LightView(APIView):
 
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        light = Light.objects.first() 
-        light.status = request.data.get('status', light.status)
+    def patch(self, request, format=None):
+        light = Light.objects.first()
+        new_status = request.data.get('status')
+        light.status = new_status
         light.save()
-        serializer = LightSerializer(light)
-        return Response(serializer.data)
+        serializer = LightSerializer(instance=light)
+        feed_url = "https://io.adafruit.com/api/v2/homeless_da01/feeds/cong-tac-den/data"
+
+        headers = {
+            "Content-Type": "application/json",
+            "X-AIO-Key": io_key
+        }
+        data = {
+            "value": "1" if new_status else "0"
+        }
+
+        response = requests.post(feed_url, headers=headers, json=data)
+
+        if response.status_code == 200:
+            print("Data posted successfully to Adafruit IO feed:", response.json())
+        else:
+            print("Failed to post data to Adafruit IO feed:", response.status_code, response.text)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class FanView(APIView):
     permission_classes = [AllowAny]
@@ -154,7 +172,7 @@ class FanView(APIView):
                 print("Data posted successfully to Adafruit IO feed:", response.json())
             else:
                 print("Failed to post data to Adafruit IO feed:", response.status_code, response.text)
-                
+
         fan.save()
         
         return Response('Fan updated successfully')
@@ -173,6 +191,13 @@ class LightLogView(APIView):
 
         return JsonResponse({'message': 'Updated activity log successfully'}, status=200)
     
+    def post(self, request, format=None):
+        serializer = LightLogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+
+
 class FanLogView(APIView):
     permission_classes = [AllowAny]
 

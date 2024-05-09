@@ -6,7 +6,6 @@ import LightImg from '../asserts/Đèn.jpg';
 import ActivityHistory from '../components/ActivityHistory';
 import LightSchedule from "../components/LightSchedule";
 import api from '../api';
-import { apiKey } from '../constants';
 
 export default function LightController () {
     const [status, setStatus] = useState('');
@@ -17,114 +16,35 @@ export default function LightController () {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                await api.get("/api/activity-log/")
-                const lastRecordStatus = await api.get("/api/light/"); 
-                if (status !== '') {
-                if (status !== lastRecordStatus.data.status) {
-                    try {
-                    const value = lastRecordStatus.data.status ? 1 : 0;
-                    const data = {
-                        value: value,
-                    };
-                    const response = await fetch(`https://io.adafruit.com/api/v2/homeless_da01/feeds/cong-tac-den/data`, {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        "X-AIO-Key": apiKey,
-                        },
-                        body: JSON.stringify(data),
-                    });
-                
-                    if (response.ok) {
-                        console.log("Data updated successfully");
-                    } else {
-                        console.error("Failed to update data:", response.statusText);
-                    }
-                    } catch (error) {
-                    console.error("Error updating data:", error);
-                    }
-                }
-                }
+                await api.get("/api/light-log/");
+                const lastRecordStatus = await api.get('/api/light/');
                 setStatus(lastRecordStatus.data['status']);
-
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-            try {
-                const scheduleResponse = await api.get("/api/schedule/");
-                const schedules = scheduleResponse.data;
-                const currentTime = new Date();
-                const currentHour = currentTime.getHours();
-                const currentMinute = currentTime.getMinutes();
-                schedules.forEach((schedule, key) => {
-                    const start_time = schedule.start_time;
-                    const end_time = schedule.end_time;
-                    // Ensure startTime and end_time are defined
-                    if (start_time && end_time) {
-                        // Split the start and end times into hours and minutes
-                        const startTime = start_time.split(":");
-                        const startHour = parseInt(startTime[0]);
-                        const startMinute = parseInt(startTime[1]);
-                        
-                        const end_timeParts = end_time.split(":");
-                        const endHour = parseInt(end_timeParts[0]);
-                        const endMinute = parseInt(end_timeParts[1]);
-                        // Check if the current time is within the schedule's time range
-                        console.log('Current hour: ' + currentHour + ':' + currentMinute);
-                        console.log('Start hour: ' + startHour + ':' + startMinute);
-                        console.log('End hour: ' + endHour + ':' + endMinute);
-                        if (
-                            (currentHour > startHour || (currentHour === startHour && currentMinute >= startMinute)) &&
-                            (currentHour < endHour || (currentHour === endHour && currentMinute < endMinute))
-                        ) {
-                            (async () => {
-                                const lastRecordStatus = await api.get("/api/light/");
-                                if (lastRecordStatus.data.status === false) {
-
-                                    const { v4: uuidv4 } = require('uuid');
-                                    try {
-                                        // Make the API call
-                                        const activityResponse = await api.post('/api/activity-log/', {
-                                            id: uuidv4(),
-                                            type: 'light',
-                                            status: true
-                                        });
-                                        console.log('Turn on light automatically');
-                                    } catch (error) {
-                                        console.error('Error toggling light status:', error);
-                                    }
-                                }
-                            })();
-                        } else {
-                            (async () => {
-                                const lastRecordStatus = await api.get("/api/light/");
-                                if (lastRecordStatus.data.status === true) {
-                                    const { v4: uuidv4 } = require('uuid');
-                                    try {
-                                        // Make the API call
-                                        const activityResponse = await api.post('/api/activity-log/', {
-                                            id: uuidv4(),
-                                            type: 'light',
-                                            status: false
-                                        });
-                                        console.log('Turn off light automatically');
-                                    } catch (error) {
-                                        console.error('Error toggling light status:', error);
-                                    }
-                                }
-                            })();
-                        }
-                    }
-                });
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
-        fetchData();    
-        const intervalId = setInterval(fetchData, 1000);
-        return () => clearInterval(intervalId);
-    }, [status]); 
+        fetchData();
+    }, []);
 
+    const handleStatusChange = async () => {
+        try {
+          const { v4: uuidv4 } = require('uuid');
+          const newStatus = !status; 
+          const lightLogResponse = await api.post('/api/light-log/', {
+            id: uuidv4(),
+            status: newStatus
+          });
+          console.log('LightLog posted:', lightLogResponse.data);
+          const lightViewResponse = await api.patch('/api/light/', {
+            status: newStatus
+          });
+          console.log('LightView patched:', lightViewResponse.data);
+        } catch (error) {
+          console.error('Error toggling light status:', error);
+        }
+        setStatus(prevStatus => !prevStatus);
+      };
+      
     const handleOptionChange = (e) => {
         setLoopOption(e.target.value);
         setSelectedDate('');
@@ -132,19 +52,6 @@ export default function LightController () {
     const handleDateChange = (e) => {
         setSelectedDate(e.target.value);
     };
-
-    const handleStatusChange = async () => {
-        try {
-          const { v4: uuidv4 } = require('uuid');
-            await api.post('/api/activity-log/', {
-            id: uuidv4(),
-            type: 'light',
-            status: !status
-          });
-        } catch (error) {
-          console.error('Error toggling status:', error);
-        }
-      };
 
       const handleSubmit = async (e) => {
         e.preventDefault();
