@@ -9,6 +9,7 @@ urlpatterns = [
     path('human-detect-record/latest/', views.LatestHumanDetect.as_view(), name='human-detect-record'),
     path('light/', views.LightView.as_view()),
     path('fan/', views.FanView.as_view()),
-    path('activity-log/', views.ActivityLogView.as_view()),
+    path('fan-log/', views.FanLogView.as_view()),
+    path('light-log/', views.LightLogView.as_view()),
     path('schedule/', views.ScheduleView.as_view()),
 ]

@@ -4,9 +4,9 @@ import Header from '../components/Header';
 import { Container, Row, Col} from 'react-bootstrap';
 import fanimage from '../asserts/Quạt.jpg';
 import '../css/FanController.css';
-import OnOffFan from '../components/onoffFan';
-import ActivityHistory from '../components/activityHistory';
-import Threshold from '../components/threshold';
+import OnOffFan from '../components/FanSwitch';
+import ActivityHistory from '../components/ActivityHistory';
+import Threshold from '../components/FanThreshold';
 
 function FanController() {
 

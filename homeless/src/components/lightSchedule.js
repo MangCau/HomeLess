@@ -10,6 +10,7 @@ export default function LightSchedule() {
     const [showAll, setShowAll] = useState(false);
     const [clickedSchedule, setClickedSchedule] = useState(null);
     
+    
     useEffect(() => {
         const fetchData = async () => {
             try {

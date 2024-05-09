@@ -2,9 +2,6 @@ import React from 'react';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Header from './components/Header';
-import SideBar from './components/SideBar';
-import Welcome from './pages/Welcome';
 import Signup from './pages/Signup';
 import Display from './components/Display';
 import FanController from './pages/FanController';
@@ -30,7 +27,7 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Welcome />
+              <Display />
             </ProtectedRoute>
           }
         />

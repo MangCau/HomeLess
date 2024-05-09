@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import SensorRecord, Light, Fan, ActivityLog, Schedule
+from .models import SensorRecord, Light, Fan, FanLog, LightLog, Schedule, FanAutoLog, FanThresholdLog
 
 class SensorRecordSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +22,22 @@ class FanSerializer(serializers.ModelSerializer):
         model = Fan
         fields = ['is_manual', 'status', 'threshold']
         
-class ActivityLogSerializer(serializers.ModelSerializer):
+class FanLogSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ActivityLog
-        fields = ['id', 'type', 'timestamp', 'status']
+        model = FanLog
+        fields = ['id', 'timestamp', 'status']
+
+class FanAutoLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FanAutoLog
+        fields = ['id', 'timestamp', 'is_manual']
+
+class FanThresholdLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FanThresholdLog
+        fields = ['id', 'timestamp', 'threshold']
+
+class LightLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LightLog
+        fields = ['id', 'timestamp', 'status']

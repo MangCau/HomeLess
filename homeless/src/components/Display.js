@@ -31,12 +31,7 @@ function SmallItems({ type, color, value }) {
 export default function Display() {
     const [temperature, setTemperature] = useState(null);
     const [humidity, setHumidity] = useState(null);
-    const [detect_human, setDetect_human] = useState(null);
-    // const [averageTemperature, setAverageTemperature] = useState(null);
-    // const [averageHumidity, setAverageHumidity] = useState(null);
-    // const [yesterdayAverageTemperature, setYesterdayAverageTemperature] = useState(null);
-    // const [yesterdayAverageHumidity, setYesterdayAverageHumidity] = useState(null);
-    // const [yesterdayNumOfPeople, setYesterdayNumOfPeople] = useState(null);
+    const [detectHuman, setDetectHuman] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,11 +39,10 @@ export default function Display() {
                 await api.get("/api/record");
                 const latestTemp = await api.get("/api/temperature-record/latest/"); 
                 const latestHumidity = await api.get("/api/humidity-record/latest/");
-                const detect_human = await api.get("/api/human-detect-record/latest/");
-                console.log(detect_human);
+                const detectHuman = await api.get("/api/human-detect-record/latest/");
                 setTemperature(latestTemp.data);
                 setHumidity(latestHumidity.data);
-                setDetect_human(detect_human.data);
+                setDetectHuman(detectHuman.data);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -71,7 +65,7 @@ export default function Display() {
             <div className="d-flex justify-content-space-around align-items-center">
                 <SmallItems type={0} color="#FFF4DE" value={temperature}/>
                 <SmallItems type={1} color="#DCFCE7" value={humidity}/>
-                <SmallItems type={2} color="#F3E8FF" value={detect_human} medium="10" diff="2" />
+                <SmallItems type={2} color="#F3E8FF" value={detectHuman} medium="10" diff="2" />
             </div>
         </div>
     );
