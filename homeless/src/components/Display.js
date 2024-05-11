@@ -21,11 +21,71 @@ function SmallItems({ type, color, value }) {
             str = "Invalid type";
     }
     return (
-        <div className="m-3" style={{ backgroundColor: color, width: '200px', height: '30%', borderRadius: '20px' }}>
+        <div className="m-3" style={{ backgroundColor: color, width: '33%', height: '30%', borderRadius: '20px' }}>
             <div className="m-3 d-flex flex-column align-items-center" style={{ backgroundColor: color_circle, borderRadius: '50%', width: '40px', height: '40px' }}></div>
             <h4 className="m-3 mb-1">{str}</h4>
         </div>
     )
+}
+function MyTable() {
+    return (
+        <div className="container-fluid">
+            <div className="row">
+                <div className="col-12">
+                    <div className="table-responsive">
+                        <table className="table">
+                            <colgroup>
+                                <col style={{ width: '5%' }} />
+                                <col style={{ width: '35%' }} />
+                                <col style={{ width: '35%' }} />
+                                <col style={{ width: '25%' }} />
+                            </colgroup>
+                            <thead className="bg-secondary text-white">
+                                <tr>
+                                    <th style={{ textDecoration: 'none', color: 'gray' }}>#</th>
+                                    <th style={{ textDecoration: 'none', color: 'gray' }}>Name</th>
+                                    <th style={{ textDecoration: 'none', color: 'gray' }}>Config</th>
+                                    <th style={{ textDecoration: 'none', color: 'gray' }}> Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Đèn</td>
+                                    <td>Config 1</td>
+                                    <td>
+                                        {/* <button className="btn btn-outline-success">On</button> */}
+                                        <button className="btn btn-outline-danger">Off</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Quạt</td>
+                                    <td>Config 2</td>
+                                    <td>
+                                        <button className="btn btn-outline-success">On</button>
+                                        {/* <button className="btn btn-outline-danger">Off</button> */}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+export function DeviceStatistics() {
+    return (
+        <div className="mt-5 m-4 bg-white p-4 pb-0" style={{ minWidth: "45%" }}>
+            <div className="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4>Thiết bị hiện tại</h4>
+                </div>
+            </div>
+            <MyTable />
+        </div>
+    );
 }
 
 export default function Display() {
@@ -53,14 +113,11 @@ export default function Display() {
     }, []); 
 
     return (
-        <div className="mt-5 m-4 bg-white p-4 pb-0">
+        <div className="mt-5  m-4 bg-white p-4 pb-0 mw-50 me-0" style={{ minWidth: "45%" }}>
             <div className="d-flex justify-content-between align-items-center">
                 <div>
                     <h4>Thông tin hôm nay</h4>
                 </div>
-                <Button className="bg-white text-secondary" style={{ borderRadius: '10px', border: '1px solid gray', height: '40px' }}>
-                    Export
-                </Button>
             </div>
             <div className="d-flex justify-content-space-around align-items-center">
                 <SmallItems type={0} color="#FFF4DE" value={temperature}/>
