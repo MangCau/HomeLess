@@ -13,7 +13,6 @@ export default function Setting() {
             <Header />
             <div className='mainbody'>
                 <SideBar />
-                
             </div>
         </div>
     );
