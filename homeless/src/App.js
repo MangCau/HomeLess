@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Dashboard from './pages/dashboard';
+import Setting from './pages/Setting';
   function Logout() {
   localStorage.clear()
   return <Navigate to="/login" />
@@ -39,6 +40,7 @@ function App() {
         <Route path='/light' element= {<LightController/>}/>
         <Route path='/display' element= {<Display/>}/>
         <Route path='/dashboard' element= {<Dashboard/>}/>
+        <Route path='/setting' element= {<Setting/>}/>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
