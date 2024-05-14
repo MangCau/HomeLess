@@ -1,7 +1,8 @@
+import PageNotFound from '../asserts/404.jpg'
+
 function NotFound() {
     return <div>
-        <h1>404 Not Found</h1>
-        <p>The page you're looking for doesn't exist!</p>
+        <img src={PageNotFound} alt="404" style={{width: '100%', height: '100%'}}/>
     </div>
 }
 

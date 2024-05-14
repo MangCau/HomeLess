@@ -3,6 +3,8 @@ import SideBar from '../components/SideBar'
 import Header from '../components/Header'
 import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap"
 import LightImg from '../asserts/Đèn.jpg'
+import LightOn from '../asserts/light-on.png'
+import LightOff from '../asserts/light-off.png'
 import ActivityHistory from '../components/ActivityHistory'
 import LightSchedule from "../components/LightSchedule"
 import api from '../api'
@@ -148,7 +150,7 @@ export default function LightController() {
                         <Col xs={6}>
                             <Container>
                                 <div className='fanimage'>
-                                    <img src={LightImg} alt='Light' className='img-fluid' />
+                                    <img src={status ? LightOn : LightOff} alt='Light' className='img-fluid' />
                                 </div>
                                 <div className='fancontroller mt-5'>
                                     <Form.Group className="">

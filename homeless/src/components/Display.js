@@ -5,24 +5,10 @@ import api from "../api"
 function SmallItems({ type, color, value }) {
     const colors = ["#FF947A", "#3CD856", "#BF83FF"]
     const color_circle = colors[type]
-    let str = ""
-
-    switch (type) {
-        case 0:
-            str = value + "°C"
-            break
-        case 1:
-            str = value + "%"
-            break
-        case 2:
-            str = value === 1 ? "Có người" : "Không có người"
-            break
-        default:
-            str = "Invalid type"
-    }
+    const str = value
     return (
         <div className="m-3" style={{ backgroundColor: color, width: '33%', height: '30%', borderRadius: '20px' }}>
-            <div className="m-3 d-flex flex-column align-items-center" style={{ backgroundColor: color_circle, borderRadius: '50%', width: '40px', height: '40px' }}></div>
+            <div className="m-3 d-flex flex-column align-items-center" style={{ backgroundColor: color_circle, borderRadius: '50%', width: '50px', height: '50px' }}></div>
             <h4 className="m-3 mb-1">{str}</h4>
         </div>
     )
@@ -89,9 +75,9 @@ export function DeviceStatistics() {
 }
 
 export default function Display() {
-    const [temperature, setTemperature] = useState(null)
-    const [humidity, setHumidity] = useState(null)
-    const [detectHuman, setDetectHuman] = useState(null)
+    const [temperature, setTemperature] = useState('')
+    const [humidity, setHumidity] = useState('')
+    const [detectHuman, setDetectHuman] = useState('')
 
     useEffect(() => {
         const fetchData = async () => {
@@ -120,9 +106,9 @@ export default function Display() {
                 </div>
             </div>
             <div className="d-flex justify-content-space-around align-items-center">
-                <SmallItems type={0} color="#FFF4DE" value={temperature}/>
-                <SmallItems type={1} color="#DCFCE7" value={humidity}/>
-                <SmallItems type={2} color="#F3E8FF" value={detectHuman} medium="10" diff="2" />
+                <SmallItems type={0} color="#FFF4DE" value={temperature === '' ? 'Loading..' : `${temperature}°C`}/>
+                <SmallItems type={1} color="#DCFCE7" value={humidity === '' ? 'Loading..' : `${humidity}%`}/>
+                <SmallItems type={2} color="#F3E8FF" value={detectHuman === '' ? 'Loading..' : (detectHuman === 0 ? "Không có người" : "Có người")} medium="10" diff="2" />
             </div>
         </div>
     )

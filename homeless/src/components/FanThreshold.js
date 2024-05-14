@@ -3,6 +3,7 @@ import {Col, Row, Image, Modal, Form, Button, Container} from 'react-bootstrap'
 import thresholdimg from '../asserts/threshold.png'
 import api from '../api'
 import {apiKey} from '../constants'
+import LoadingIndicator from "./LoadingIndicator"
 export default function Threshold () {
     const [showModal, setShowModal] = useState(false)
     const [newDegree, setNewDegree] = useState('')
@@ -49,6 +50,7 @@ export default function Threshold () {
                 <img src={thresholdimg} alt='Threshold' className='img-fluid'/>
                 <div className="position-absolute top-50 start-50 translate-middle">
                     <div className="d-flex flex-column align-items-center mt-3">
+                        {degree === '' && <LoadingIndicator />}
                         <span className='degree'>{degree}</span>
                         <span className='textdegree'>độ C</span>
                     </div>
