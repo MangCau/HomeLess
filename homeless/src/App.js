@@ -3,7 +3,6 @@ import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Signup from './pages/Signup'
-import Display from './components/Display'
 import FanController from './pages/FanController'
 import LightController from './pages/LightController'
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -26,27 +25,54 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<RegisterAndLogout />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="*" element={<NotFound />} />
+        
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/fan" 
+          element={
+            <ProtectedRoute>
+              <FanController />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/light" 
           element={
             <ProtectedRoute>
               <LightController />
-              <FanController />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/setting" 
+          element={
+            <ProtectedRoute>
               <Setting />
             </ProtectedRoute>
-          }
+          } 
         />
-        <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/signup" element={<RegisterAndLogout />} />
-        <Route path='/fan' element = {<FanController/>}/>
-        <Route path='/light' element= {<LightController/>}/>
-        <Route path='/dashboard' element= {<Dashboard/>}/>
-        <Route path='/setting' element= {<Setting/>}/>
-        <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </BrowserRouter>
   )
 }
+
 export default App
