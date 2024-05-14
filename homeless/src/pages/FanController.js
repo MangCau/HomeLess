@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import SideBar from '../components/SideBar';
-import Header from '../components/Header';
-import { Container, Row, Col} from 'react-bootstrap';
-import fanimage from '../asserts/Quạt.jpg';
-import '../css/FanController.css';
-import OnOffFan from '../components/FanSwitch';
-import ActivityHistory from '../components/ActivityHistory';
-import Threshold from '../components/FanThreshold';
+import React, { useState } from 'react'
+import SideBar from '../components/SideBar'
+import Header from '../components/Header'
+import { Container, Row, Col} from 'react-bootstrap'
+import fanimage from '../asserts/Quạt.jpg'
+import '../css/FanController.css'
+import OnOffFan from '../components/FanSwitch'
+import ActivityHistory from '../components/ActivityHistory'
+import Threshold from '../components/FanThreshold'
 
 function FanController() {
 
@@ -38,7 +38,7 @@ function FanController() {
         </div>
     </div>
     
-  );
+  )
 }
 
-export default FanController;
+export default FanController

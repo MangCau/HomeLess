@@ -1,39 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import Button from 'react-bootstrap/Button';
-import logo from '../asserts/logo.png';
-import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
-import Stack from 'react-bootstrap/Stack';
-import ava from '../asserts/ava.png';
-import logout from '../asserts/logout-icon.png';
-import LogoutConfirmationModal from './Logoutbutton'; 
-import Notifications from './Notification';
+import React, { useState, useEffect } from 'react'
+import Button from 'react-bootstrap/Button'
+import logo from '../asserts/logo.png'
+import Container from 'react-bootstrap/Container'
+import Navbar from 'react-bootstrap/Navbar'
+import Stack from 'react-bootstrap/Stack'
+import ava from '../asserts/ava.png'
+import logout from '../asserts/logout-icon.png'
+import LogoutConfirmationModal from './Logoutbutton' 
+import Notifications from './Notification'
 
 const imageStyle = {
     width: '25px',
     height: '25px',
-};
+}
 
 const Header = () => {
-    const [notifications, setNotifications] = useState([]);
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [notifications, setNotifications] = useState([])
+    const [showLogoutModal, setShowLogoutModal] = useState(false)
 
     useEffect(() => {
         setNotifications([
             'New message from John',
             'You have 3 new friend requests',
             'Your order has been shipped',
-        ]);
-    }, []);
+        ])
+    }, [])
 
     const handleLogout = () => {
-        setShowLogoutModal(true);
-    };
+        setShowLogoutModal(true)
+    }
 
     const handleLogoutConfirm = () => {
-        console.log("User confirmed logout");
-        setShowLogoutModal(false);
-    };
+        console.log("User confirmed logout")
+        setShowLogoutModal(false)
+    }
 
     return (
         <Stack direction="horizontal" gap={3} className="justify-content-between">
@@ -85,7 +85,7 @@ const Header = () => {
                 onConfirm={handleLogoutConfirm}
             />
         </Stack>
-    );
-};
+    )
+}
 
-export default Header;
+export default Header

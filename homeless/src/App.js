@@ -1,17 +1,18 @@
-import React from 'react';
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from 'react'
+import './App.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Signup from './pages/Signup';
-import Display from './components/Display';
-import FanController from './pages/FanController';
-import LightController from './pages/LightController';
+import Signup from './pages/Signup'
+import Display from './components/Display'
+import FanController from './pages/FanController'
+import LightController from './pages/LightController'
 import ProtectedRoute from "./components/ProtectedRoute"
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
-import Dashboard from './pages/dashboard';
-import Setting from './pages/Setting';
-  function Logout() {
+import Login from './pages/Login'
+import NotFound from './pages/NotFound'
+import Dashboard from './pages/dashboard'
+import Setting from './pages/Setting'
+
+function Logout() {
   localStorage.clear()
   return <Navigate to="/login" />
 }
@@ -29,7 +30,10 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
+              <LightController />
+              <FanController />
               <Dashboard />
+              <Setting />
             </ProtectedRoute>
           }
         />
@@ -38,7 +42,6 @@ function App() {
         <Route path="/signup" element={<RegisterAndLogout />} />
         <Route path='/fan' element = {<FanController/>}/>
         <Route path='/light' element= {<LightController/>}/>
-        <Route path='/display' element= {<Display/>}/>
         <Route path='/dashboard' element= {<Dashboard/>}/>
         <Route path='/setting' element= {<Setting/>}/>
         <Route path="*" element={<NotFound />}></Route>
@@ -46,4 +49,4 @@ function App() {
     </BrowserRouter>
   )
 }
-export default App;
+export default App

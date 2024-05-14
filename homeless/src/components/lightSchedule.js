@@ -1,33 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
-import api from '../api';
+import React, { useEffect, useState } from "react"
+import { Container, Row, Col, Button } from "react-bootstrap"
+import api from '../api'
 
 export default function LightSchedule() {
-    const [schedules, setSchedules] = useState([]);
-    const [showAll, setShowAll] = useState(false);
+    const [schedules, setSchedules] = useState([])
+    const [showAll, setShowAll] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await api.get("/api/schedule/");
-                setSchedules(response.data);
+                const response = await api.get("/api/schedule/")
+                setSchedules(response.data)
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error)
             }
-        };
-        fetchData();
-    }, []);
+        }
+        fetchData()
+    }, [])
 
     const handleDeleteSchedule = async (id) => {
         try {
-            await api.post("/api/schedule/", { "id": id });
-            setSchedules(schedules.filter(schedule => schedule.id !== id));
+            await api.post("/api/schedule/", { "id": id })
+            setSchedules(schedules.filter(schedule => schedule.id !== id))
         } catch (error) {
-            console.error('Error deleting schedule:', error);
+            console.error('Error deleting schedule:', error)
         }
-    };
+    }
 
-    const visibleSchedules = showAll ? schedules : schedules.slice(0, 5);
+    const visibleSchedules = showAll ? schedules : schedules.slice(0, 5)
 
     return (
         <Container className="d-flex justify-content-center">
@@ -78,5 +78,5 @@ export default function LightSchedule() {
                 )}
             </Row>
         </Container>
-    );
+    )
 }

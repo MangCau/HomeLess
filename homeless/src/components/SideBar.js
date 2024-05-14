@@ -1,12 +1,12 @@
-import React from 'react';
-import dashboardImage from '../asserts/dashboard_.png';
-import fanImage from '../asserts/fan.png';
-import lightImage from '../asserts/light.png';
-import settingImage from '../asserts/setting.png';
-import signoutImage from '../asserts/signout.png';
-import logoWhite from '../asserts/logo_white.png';
-import Button from 'react-bootstrap/Button';
-import '../css/sidebar.css';
+import React from 'react'
+import dashboardImage from '../asserts/dashboard_.png'
+import fanImage from '../asserts/fan.png'
+import lightImage from '../asserts/light.png'
+import settingImage from '../asserts/setting.png'
+import signoutImage from '../asserts/signout.png'
+import logoWhite from '../asserts/logo_white.png'
+import Button from 'react-bootstrap/Button'
+import '../css/sidebar.css'
 
 function SideBarItem({ img_src, des, to }) {
     return (
@@ -14,7 +14,7 @@ function SideBarItem({ img_src, des, to }) {
             <img src={img_src} alt="icon" className='sidebaritems'/>
             <p className="mb-0">{des}</p>
         </Button>
-    );
+    )
 }
 
 function Advertisement() {
@@ -25,7 +25,7 @@ function Advertisement() {
             <p>Được trải nghiệm toàn bộ các tính năng nhà ở thông minh</p>
             <Button variant="light" className="text-5D5FEF">Mua ngay</Button>
         </div>
-    );
+    )
 }
 
 export default function SideBar() {
@@ -36,9 +36,9 @@ export default function SideBar() {
                 <SideBarItem img_src={fanImage} des="Quạt" to="/fan" /><br></br>
                 <SideBarItem img_src={lightImage} des="Đèn" to="/light" /><br></br>
                 <SideBarItem img_src={settingImage} des="Cài đặt" to="/setting" /><br></br>
-                <SideBarItem img_src={signoutImage} des="Đăng xuất" to="/signout" /><br></br>
+                <SideBarItem img_src={signoutImage} des="Đăng xuất" to="/logout" /><br></br>
                 <Advertisement />
             </div>
         </div>
-    );
+    )
 }

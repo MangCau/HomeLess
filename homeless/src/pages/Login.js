@@ -1,34 +1,35 @@
-import React, {useState} from 'react';
-import { Container, Row, Col, Form, FloatingLabel, Button} from 'react-bootstrap';
-import welcomeimg from '../asserts/smarthome.jpg';
-import logo from '../asserts/logo.png';
-import Navbar from 'react-bootstrap/Navbar';
-import '../css/LoginPage.css';
-import api from "../api";
-import { useNavigate } from "react-router-dom";
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import React, {useState} from 'react'
+import { Container, Row, Col, Form, FloatingLabel, Button} from 'react-bootstrap'
+import welcomeimg from '../asserts/smarthome.jpg'
+import logo from '../asserts/logo.png'
+import Navbar from 'react-bootstrap/Navbar'
+import '../css/LoginPage.css'
+import api from "../api"
+import { useNavigate } from "react-router-dom"
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants"
+import LoadingIndicator from '../components/LoadingIndicator'
 
 function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    setLoading(true);
-    e.preventDefault();
+    setLoading(true)
+    e.preventDefault()
 
     try {
         const res = await api.post("/api/token/", { username, password })
-        localStorage.setItem(ACCESS_TOKEN, res.data.access);
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-        navigate("/")
+        localStorage.setItem(ACCESS_TOKEN, res.data.access)
+        localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
+        navigate("/Dashboard")
     } catch (error) {
         alert(error)
     } finally {
         setLoading(false)
     }
-};
+}
   return (
     <Container fluid>
       <Row>
@@ -78,6 +79,7 @@ function Login() {
                       
                     />
                   </FloatingLabel>
+                  {loading && <LoadingIndicator />}
                   <Button variant="primary" type="submit">
                     <a className='logintext'>Đăng nhập</a>
                   </Button>
@@ -87,7 +89,7 @@ function Login() {
         </Col>
       </Row>
     </Container>
-  );
+  )
 }
 
-export default Login;
+export default Login

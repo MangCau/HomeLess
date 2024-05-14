@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
     LineChart,
     Line,
@@ -8,7 +8,7 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
-} from 'recharts';
+} from 'recharts'
 
 const data = [
     {
@@ -53,15 +53,15 @@ const data = [
         "nhiệt độ": 4300,
         amt: 2100,
     },
-];
+]
 
 const ChartO = () => {
     useEffect(() => {
         // Any lifecycle logic here if needed
         return () => {
             // Cleanup logic here if needed
-        };
-    }, []); // Empty dependency array means it runs only once on mount
+        }
+    }, []) // Empty dependency array means it runs only once on mount
 
     return (
         <div style={{ width: '100%' }}>
@@ -78,7 +78,7 @@ const ChartO = () => {
                 </LineChart>
             </ResponsiveContainer>
         </div>
-    );
-};
+    )
+}
 
-export default ChartO;
+export default ChartO

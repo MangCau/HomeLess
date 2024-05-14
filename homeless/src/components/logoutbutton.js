@@ -1,9 +1,10 @@
-import '../css/logoutbutton.css';
-import React from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import '../css/logoutbutton.css'
+import React from 'react'
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
 
 const LogoutConfirmationModal = ({ show, onHide, onConfirm }) => {
+
     return (
         <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
@@ -19,7 +20,7 @@ const LogoutConfirmationModal = ({ show, onHide, onConfirm }) => {
                 </Button>
             </Modal.Footer>
         </Modal>
-    );
-};
+    )
+}
 
-export default LogoutConfirmationModal;
+export default LogoutConfirmationModal

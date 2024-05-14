@@ -1,13 +1,13 @@
 
-import React from 'react';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
-import noti from '../asserts/noti-icon.png';
+import React from 'react'
+import DropdownButton from 'react-bootstrap/DropdownButton'
+import Dropdown from 'react-bootstrap/Dropdown'
+import noti from '../asserts/noti-icon.png'
 
 const imageStyle = {
     width: '25px',
     height: '25px',
-};
+}
 
 const DropdownComponent = ({ notifications }) => {
     return (
@@ -16,7 +16,7 @@ const DropdownComponent = ({ notifications }) => {
                 <Dropdown.Item key={index}>{notification}</Dropdown.Item>
             ))}
         </DropdownButton>
-    );
-};
+    )
+}
 
-export default DropdownComponent; 
+export default DropdownComponent 

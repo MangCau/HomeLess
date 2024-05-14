@@ -1,24 +1,24 @@
-import React, {useState} from 'react';
-import { Container, Row, Col, Form, FloatingLabel, Button} from 'react-bootstrap';
-import welcomeimg from '../asserts/smarthome.jpg';
-// import LoginForm from '../components/loginForm';
-import logo from '../asserts/logo.png';
-import Navbar from 'react-bootstrap/Navbar';
-import '../css/LoginPage.css';
-import { useNavigate } from "react-router-dom";
-import api from "../api";
+import React, {useState} from 'react'
+import { Container, Row, Col, Form, FloatingLabel, Button} from 'react-bootstrap'
+import welcomeimg from '../asserts/smarthome.jpg'
+// import LoginForm from '../components/loginForm'
+import logo from '../asserts/logo.png'
+import Navbar from 'react-bootstrap/Navbar'
+import '../css/LoginPage.css'
+import { useNavigate } from "react-router-dom"
+import api from "../api"
 
 function SignupPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(false);
-  // const [phonenum, setPhonenum] = useState('');
-  const navigate = useNavigate();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState('')
+  const [loading, setLoading] = useState(false)
+  // const [phonenum, setPhonenum] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
-    setLoading(true);
-    e.preventDefault();
+    setLoading(true)
+    e.preventDefault()
 
     try {
         const res = await api.post("/api/user/register/", { username, email, password })
@@ -29,7 +29,7 @@ function SignupPage() {
     } finally {
         setLoading(false)
     }
-};
+}
   return (
     <Container fluid>
       <Row>
@@ -102,12 +102,12 @@ function SignupPage() {
                         <a className='logintext'>Đăng ký</a>
                     </Button>
                 </Form>
-                <a href='/' style={{color:'#5D5FEF', marginTop:'20px'}}>Đăng nhập</a>
+                <a href='/login' style={{color:'#5D5FEF', marginTop:'20px'}}>Đăng nhập</a>
             </div>
         </Col>
       </Row>
     </Container>
-  );
+  )
 }
 
-export default SignupPage;
+export default SignupPage

@@ -1,11 +1,11 @@
-import React from 'react';
-import { Container, Row } from 'react-bootstrap'; // Import Container and Row from react-bootstrap
-import SideBar from '../components/SideBar';
-import Header from '../components/Header';
-import Display, { DeviceStatistics } from '../components/Display';
-import Example from '../components/Chart';
-import ChartOfTemp from '../components/ChartOfTemp';
-import ChartActive from '../components/ChartActive';
+import React from 'react'
+import { Container, Row } from 'react-bootstrap'
+import SideBar from '../components/SideBar'
+import Header from '../components/Header'
+import Display, { DeviceStatistics } from '../components/Display'
+import Example from '../components/Chart'
+import ChartOfTemp from '../components/ChartOfTemp'
+import ChartActive from '../components/ChartActive'
 
 export default function Setting() {
     return (
@@ -15,5 +15,5 @@ export default function Setting() {
                 <SideBar />
             </div>
         </div>
-    );
+    )
 }

@@ -40,19 +40,19 @@ const OnOffFan = () => {
 
   const handleAutoChange = async () => {
     try {
-      const { v4: uuidv4 } = require('uuid');
+      const { v4: uuidv4 } = require('uuid')
       const fanAutoLogResponse = await api.post('/api/fan-log/', {
         id: uuidv4(),
         is_manual: !auto,
         log_type: 'auto',
-      });
-      await api.patch('/api/fan/', { is_manual: !auto });
-      console.log(fanAutoLogResponse.data);
+      })
+      await api.patch('/api/fan/', { is_manual: !auto })
+      console.log(fanAutoLogResponse.data)
     } catch (error) {
-      console.error('Error toggling auto status:', error);
+      console.error('Error toggling auto status:', error)
     }
-    setAuto(prevStatus => !prevStatus);
-  };
+    setAuto(prevStatus => !prevStatus)
+  }
   
   return (
     <Container>
