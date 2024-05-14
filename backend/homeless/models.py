@@ -17,7 +17,10 @@ class Schedule(models.Model):
     id = models.AutoField(primary_key=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    everyday = models.BooleanField(default=False)
+    # everyday = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Schedule {self.id}'
 
 
 class Light(models.Model):

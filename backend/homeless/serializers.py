@@ -9,7 +9,7 @@ class SensorRecordSerializer(serializers.ModelSerializer):
 class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = ['id', 'start_time', 'end_time', 'everyday']
+        fields = ['id', 'start_time', 'end_time']
 
 class LightSerializer(serializers.ModelSerializer):
     schedules = ScheduleSerializer(many=True)

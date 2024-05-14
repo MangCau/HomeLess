@@ -1,110 +1,171 @@
-import React, { useState, useEffect } from "react";
-import SideBar from '../components/SideBar';
-import Header from '../components/Header';
-import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
-import LightImg from '../asserts/Đèn.jpg';
-import ActivityHistory from '../components/ActivityHistory';
-import LightSchedule from "../components/LightSchedule";
-import api from '../api';
+import React, { useState, useEffect } from "react"
+import SideBar from '../components/SideBar'
+import Header from '../components/Header'
+import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap"
+import LightImg from '../asserts/Đèn.jpg'
+import ActivityHistory from '../components/ActivityHistory'
+import LightSchedule from "../components/LightSchedule"
+import api from '../api'
 
-export default function LightController () {
-    const [status, setStatus] = useState('');
-    const [showModal, setShowModal] = useState(false);
-    const [loopOption, setLoopOption] = useState('everyday');
-    const [selectedDate, setSelectedDate] = useState('');
-    
+export default function LightController() {
+    const [status, setStatus] = useState('')
+    const [showModal, setShowModal] = useState(false)
+    const [startTime, setStartTime] = useState('')
+    const [endTime, setEndTime] = useState('')
+    const [schedules, setSchedules] = useState([])
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                await api.get("/api/light-log/");
-                const lastRecordStatus = await api.get('/api/light/');
-                setStatus(lastRecordStatus.data['status']);
+                await fetchLightStatus()
+                await fetchSchedules()
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error)
             }
-        };
-        fetchData();
-    }, []);
+        }
+        fetchData()
+        const checkScheduleAndUpdateLight = () => {
+            const currentTime = new Date()
+            for (const schedule of schedules) {
+                const startTimeParts = schedule.start_time.split(':')
+                const endTimeParts = schedule.end_time.split(':')
+                const startTime = new Date()
+                startTime.setHours(startTimeParts[0], startTimeParts[1], startTimeParts[2] || 0, 0)
+                const endTime = new Date()
+                endTime.setHours(endTimeParts[0], endTimeParts[1], endTimeParts[2] || 0, 0)
+                console.log(currentTime >= startTime && currentTime <= endTime)
+                    if (currentTime >= startTime && currentTime <= endTime) {
+                    if (!status) turnOnLight()
+                    return 
+                }
+            }
+        
+            if (status) turnOffLight()
+        }
+        const intervalId = setInterval(checkScheduleAndUpdateLight, 1000)
+        return () => clearInterval(intervalId)
+    }, [status])
+    
+    
+    const turnOnLight = async () => {
+        try {
+            const { v4: uuidv4 } = require('uuid')
+            await api.post('/api/light-log/', {
+                id: uuidv4(),
+                status: true
+            })
+            setStatus(true)
+        } catch (error) {
+            console.error('Error turning on light:', error)
+        }
+    }
+    
+    const turnOffLight = async () => {
+        try {
+            const { v4: uuidv4 } = require('uuid')
+            await api.post('/api/light-log/', {
+                id: uuidv4(),
+                status: false
+            })
+            setStatus(false)
+        } catch (error) {
+            console.error('Error turning off light:', error)
+        }
+    }
+    
+
+    const fetchLightStatus = async () => {
+        try {
+            const lastRecordStatus = await api.get('/api/light/')
+            setStatus(lastRecordStatus.data['status'])
+        } catch (error) {
+            console.error('Error fetching light status:', error)
+        }
+    }
+
+    const fetchSchedules = async () => {
+        try {
+            const response = await api.get("/api/schedule/")
+            setSchedules(response.data)
+        } catch (error) {
+            console.error('Error fetching schedules:', error)
+        }
+    }
 
     const handleStatusChange = async () => {
         try {
-          const { v4: uuidv4 } = require('uuid');
-          const newStatus = !status; 
-          const lightLogResponse = await api.post('/api/light-log/', {
-            id: uuidv4(),
-            status: newStatus
-          });
-          console.log('LightLog posted:', lightLogResponse.data);
-          const lightViewResponse = await api.patch('/api/light/', {
-            status: newStatus
-          });
-          console.log('LightView patched:', lightViewResponse.data);
+            const { v4: uuidv4 } = require('uuid')
+            const newStatus = !status
+            await api.post('/api/light-log/', {
+                id: uuidv4(),
+                status: newStatus
+            })
+            setStatus(prevStatus => !prevStatus)
         } catch (error) {
-          console.error('Error toggling light status:', error);
+            console.error('Error toggling light status:', error)
         }
-        setStatus(prevStatus => !prevStatus);
-      };
-      
-    const handleOptionChange = (e) => {
-        setLoopOption(e.target.value);
-        setSelectedDate('');
-    };
-    const handleDateChange = (e) => {
-        setSelectedDate(e.target.value);
-    };
+    }
 
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        const ontime = document.getElementById('ontime').value;
-        const offtime = document.getElementById('offtime').value;
-        const selectedOption = loopOption;
-        const selectedDay = loopOption === 'oneday' ? document.getElementById('onedayselect').value : '';
-        const data = {
-            start_time: ontime,
-            end_time: offtime,
-            everyday: selectedOption === 'everyday',
-        };
-    
-        // if (selectedOption === 'oneday') {
-        //     data['selected_day'] = selectedDay;
-        // }
-    
-        try {
-            const response = await api.post('/api/schedule/', data);
-            console.log(response);
-        } catch (error) {
-            console.error('Error adding schedule:', error);
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        if (checkScheduleConflicts({ startTime, endTime })) {
+            window.alert('Thời gian biểu trùng lặp!')
+            return
         }
-    };
+        const data = {
+            start_time: startTime,
+            end_time: endTime,
+        }
+        try {
+            const response = await api.post('/api/add-schedule/', data)
+            console.log(response)
+            setShowModal(false)
+        } catch (error) {
+            console.error('Error adding schedule:', error)
+        }
+    }
+
+    const checkScheduleConflicts = (newSchedule) => {
+        for (let schedule of schedules) {
+            if (newSchedule.startTime >= schedule.start_time && newSchedule.startTime <= schedule.end_time) {
+                return true
+            }
+            if (newSchedule.endTime >= schedule.start_time && newSchedule.endTime <= schedule.end_time) {
+                return true
+            }
+        }
+        return false
+    }
     
+
     return (
         <div className='mainpage'>
-            <Header/>
+            <Header />
             <div className='mainbody'>
-                <SideBar/>
+                <SideBar />
                 <Container>
                     <Row>
                         <Col xs={6}>
                             <Container>
                                 <div className='fanimage'>
-                                    <img src={LightImg} alt='Light' className='img-fluid'/>
+                                    <img src={LightImg} alt='Light' className='img-fluid' />
                                 </div>
                                 <div className='fancontroller mt-5'>
                                     <Form.Group className="">
                                         <Form.Label className="d-flex justify-content-between align-content-center">
-                                        <span>Trạng thái</span>
-                                        <span>
-                                            <Form.Check 
-                                            type="switch"
-                                            id="status-switch-light"
-                                            checked={status}
-                                            onChange={handleStatusChange}
-                                            />
-                                        </span>
+                                            <span>Trạng thái</span>
+                                            <span>
+                                                <Form.Check
+                                                    type="switch"
+                                                    id="status-switch-light"
+                                                    checked={status}
+                                                    onChange={handleStatusChange}
+                                                />
+                                            </span>
                                         </Form.Label>
                                     </Form.Group>
                                     <div className="d-flex justify-content-center justify-content-between align-items-center mb-4">
-                                        <span>Thời gian biểu tự động bật/tắt</span>
+                                        <span>Thêm thời gian biểu</span>
                                         <span>
                                             <Button style={{ backgroundColor: '#5D5FEF', padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} onClick={() => setShowModal(true)}>
                                                 <a className='logintext'>+</a>
@@ -112,11 +173,11 @@ export default function LightController () {
                                         </span>
                                     </div>
                                 </div>
+                                <ActivityHistory />
                             </Container>
-                        <ActivityHistory/>
                         </Col>
                         <Col xs={6} className="d-flex justify-content-center align-items-center">
-                            <LightSchedule/>
+                            <LightSchedule />
                         </Col>
                     </Row>
                     <Modal show={showModal} onHide={() => setShowModal(false)} centered>
@@ -125,48 +186,29 @@ export default function LightController () {
                         </Modal.Header>
                         <Modal.Body>
                             <Form onSubmit={handleSubmit}>
-                                    <Form.Group className="mb-3" >
-                                        <Form.Label>BẬT LÚC</Form.Label>
-                                        <Form.Control id="ontime" type="time" placeholder="Enter time to turn on light" required />
-                                    </Form.Group>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>TẮT LÚC</Form.Label>
-                                        <Form.Control id="offtime" type="time" placeholder="Enter time to turn off light" required />
-                                    </Form.Group>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>VÒNG LẶP</Form.Label>
-                                        <div>
-                                            <Form.Check inline
-                                                type="radio" 
-                                                label="Mỗi ngày" 
-                                                id="everyday" 
-                                                name="loopOption"
-                                                value="everyday"
-                                                onChange={handleOptionChange}
-                                                checked={loopOption === 'everyday'}
-                                            />
-                                            <Form.Check inline
-                                                type="radio" 
-                                                label="Một ngày" 
-                                                id="oneday" 
-                                                name="loopOption"
-                                                value="oneday"
-                                                onChange={handleOptionChange}
-                                                checked={loopOption === 'oneday'}
-                                            />
-                                        </div>
-                                    </Form.Group>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>CHỌN NGÀY</Form.Label>
-                                        <Form.Control id="onedayselect" type="date" placeholder="Enter a day for loop" 
-                                        disabled={loopOption === 'everyday'} value={selectedDate} 
-                                        required={loopOption === 'oneday'} onChange={handleDateChange}/>
-                                    </Form.Group>
-                                    <Modal.Footer>
-                                        <Button style={{ backgroundColor: '#F37272'}} onClick={() => setShowModal(false)}>Hủy</Button>
-                                        <Button type="submit" style={{ backgroundColor: '#5D5FEF'}}>Lưu</Button>
-                                    </Modal.Footer>
-                                </Form>
+                                <Form.Group className="mb-3" >
+                                    <Form.Label>BẬT LÚC</Form.Label>
+                                    <Form.Control
+                                        type="time"
+                                        value={startTime}
+                                        onChange={(e) => setStartTime(e.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label>TẮT LÚC</Form.Label>
+                                    <Form.Control
+                                        type="time"
+                                        value={endTime}
+                                        onChange={(e) => setEndTime(e.target.value)}
+                                        required
+                                    />
+                                </Form.Group>
+                                <Modal.Footer>
+                                    <Button style={{ backgroundColor: '#F37272' }} onClick={() => setShowModal(false)}>Hủy</Button>
+                                    <Button type="submit" style={{ backgroundColor: '#5D5FEF' }}>Lưu</Button>
+                                </Modal.Footer>
+                            </Form>
                         </Modal.Body>
                     </Modal>
                 </Container>

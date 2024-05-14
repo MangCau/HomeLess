@@ -6,7 +6,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Stack from 'react-bootstrap/Stack';
 import ava from '../asserts/ava.png';
 import logout from '../asserts/logout-icon.png';
-import LogoutConfirmationModal from './LogOutButton'; 
+import LogoutConfirmationModal from './Logoutbutton'; 
 import Notifications from './Notification';
 
 const imageStyle = {
