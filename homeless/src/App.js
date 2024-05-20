@@ -9,7 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import Dashboard from './pages/dashboard'
-import Setting from './pages/Setting'
+import Setting from './pages/Sencor'
 
 function Logout() {
   localStorage.clear()
@@ -63,7 +63,7 @@ function App() {
           } 
         />
         <Route 
-          path="/setting" 
+          path="/sencor" 
           element={
             <ProtectedRoute>
               <Setting />

@@ -451,15 +451,14 @@ class Chart1(APIView):
         detection_sums = sensor_records.extra({
             'date': "DATE(timestamp)"
         }).values('date').annotate(sum=Sum('value')).order_by('date')
-
         detection_dict = {detection['date']: detection['sum'] for detection in detection_sums}
 
         current_date = start_date.date()
         results = []
-
         while current_date <= end_date.date():
-            if current_date in detection_dict:
-                detection_count = detection_dict[current_date]
+            current_date_str = current_date.strftime('%Y-%m-%d')
+            if current_date_str in detection_dict:
+                detection_count = detection_dict[current_date_str]
             else:
                 detection_count = 0
             results.append({

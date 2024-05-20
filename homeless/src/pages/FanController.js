@@ -5,7 +5,7 @@ import { Container, Row, Col} from 'react-bootstrap'
 import fanimage from '../asserts/Quạt.jpg'
 import '../css/FanController.css'
 import OnOffFan from '../components/FanSwitch'
-import ActivityHistory from '../components/ActivityHistory'
+import ActivityHistory from '../components/FanActivityHistory'
 import Threshold from '../components/FanThreshold'
 
 function FanController() {
@@ -18,9 +18,9 @@ function FanController() {
             <Container>
               <Row>
                 <Col xs={6}>
-                  <div className='fanimage'>
-                    <img src={fanimage} alt='Fan' className='img-fluid'/>
-                  </div>
+                <div className="fanimage">
+                  <img src={fanimage} alt="Fan" className="img-fluid" />
+              </div>
                   <div className='fancontroller'>
                     <OnOffFan/>
                   </div>

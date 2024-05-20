@@ -19,14 +19,22 @@ export default function LightSchedule() {
     }, [])
 
     const handleDeleteSchedule = async (id) => {
-        try {
-            await api.post("/api/schedule/", { "id": id })
-            setSchedules(schedules.filter(schedule => schedule.id !== id))
-        } catch (error) {
-            console.error('Error deleting schedule:', error)
+        const userConfirmed = window.confirm('Are you sure you want to delete this schedule?');
+    
+        if (userConfirmed) {
+            try {
+                await api.post("/api/schedule/", { "id": id });
+                setSchedules(schedules.filter(schedule => schedule.id !== id));
+                alert('Schedule deleted successfully.');
+            } catch (error) {
+                console.error('Error deleting schedule:', error);
+                alert('Failed to delete the schedule. Please try again.');
+            }
+        } else {
+            alert('Schedule deletion cancelled.');
         }
     }
-
+    
     const visibleSchedules = showAll ? schedules : schedules.slice(0, 5)
 
     return (
@@ -36,7 +44,7 @@ export default function LightSchedule() {
                     <Col key={index} xs={12} style={{ border: '1px solid #ced4da', borderRadius: '10px', padding: '20px', marginBottom: '20px' }}>
                         <Row>
                             <Col xs={12} className="d-flex justify-content-center mb-3">
-                                <a style={{ color: '#5D5FEF', fontWeight: 'bold', fontSize: '16px' }}>Everyday</a>
+                                <a style={{ color: '#5D5FEF', fontWeight: 'bold', fontSize: '16px' }}>Mỗi ngày</a>
                             </Col>
                             <Col xs={12}>
                                 <Row>

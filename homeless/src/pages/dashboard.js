@@ -3,10 +3,10 @@ import { Container } from 'react-bootstrap';
 import SideBar from '../components/SideBar';
 import Header from '../components/Header';
 import Display, { DeviceStatistics } from '../components/Display';
-import Example from '../components/Chart';
-import ChartOfTemp from '../components/ChartOfTemp';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart,
+    Line,BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import api from "../api";
+import axios from 'axios';
 // import ChartActive from '../components/ChartActive';
 
 export default function Dashboard() {
@@ -16,6 +16,103 @@ export default function Dashboard() {
     const handleSelectChange = (e) => {
         setSelectedRange(e.target.value);
     };
+    function Example () {
+        const [data, setData] = useState([]);
+        useEffect(() => {
+            const fetchData = async (selectedRange) => {
+                try {
+                    const num = selectedRange - 1
+                    const latestTempResponse = await api.get(`/api/chart1/${num}`);
+                    const tmp = latestTempResponse.data
+                    setData(tmp);
+
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData(selectedRange);
+            const intervalId = setInterval(() => {
+                fetchData(selectedRange); // Fetch data periodically with the current selectedRange
+            }, 1000);
+
+            return () => clearInterval(intervalId);
+        }, [selectedRange]); 
+        
+      
+        const [activeIndex, setActiveIndex] = useState(0)
+      
+        const handleClick = (data, index) => {
+          setActiveIndex(index)
+        }
+      
+        const activeItem = data[activeIndex]
+      
+        return (
+          <div style={{ width: '100%' }}>
+            <h4 className='ms-5'>Biểu đồ có người</h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                width={500}
+                height={300}
+                data={data}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="detection_count" fill="#BF83FF" name="lượng phát hiện" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )
+      }
+    function ChartO () {
+        const [dataTemp, setDataTemp] = useState([]);
+        useEffect(() => {
+            const fetchData = async (selectedRange) => {
+                try {
+                    const num = selectedRange - 1
+                    const latestTempResponse = await api.get(`/api/chart2/${num}`);
+                    const tmp = latestTempResponse.data
+                    setDataTemp(tmp);
+
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            console.log('Fetching data:', dataTemp)
+            fetchData(selectedRange);
+            const intervalId = setInterval(() => {
+                fetchData(selectedRange); // Fetch data periodically with the current selectedRange
+            }, 1000);
+
+            return () => clearInterval(intervalId);
+        }, [selectedRange]); 
+    
+        return (
+            <div style={{ width: '100%' }}>
+                <h4 className='ms-5'>Biểu đồ nhiệt độ, độ ẩm</h4>
+                <ResponsiveContainer width="100%" height={300}>
+                    <LineChart width={500} height={300} data={dataTemp}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" padding={{ left: 30, right: 30 }} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Line type="monotone" dataKey="mean_temp" stroke="#FF947A" activeDot={{ r: 8 }} name="nhiệt độ"/>
+                        <Line type="monotone" dataKey="mean_humidity" stroke="#82ca9d" name="độ ẩm"/>
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+        )
+    }
     function ChartActiveFan () {
         const [dataFan, setDataFan] = useState([]);
         const [activeIndex, setActiveIndex] = useState(0);
@@ -24,7 +121,6 @@ export default function Dashboard() {
             const fetchData = async (selectedRange) => {
                 try {
                     const latestTempResponse = await api.get(`/api/fan/${selectedRange}`);
-                    console.log(latestTempResponse.data, `/api/fan/${selectedRange}`, "/api/light/1");
                     const transformedData = latestTempResponse.data.map(item => ({
                         ...item,
                         working_time_seconds: item.working_time_seconds / 60
@@ -49,9 +145,6 @@ export default function Dashboard() {
         };
 
         const activeItem = dataFan[activeIndex];
-
-        // Debugging
-        console.log("Data:", dataFan);
 
         return (
             <div style={{ width: '100%' }}>
@@ -87,7 +180,6 @@ export default function Dashboard() {
             const fetchData = async (selectedRange) => {
                 try {
                     const latestTempResponse = await api.get(`/api/light/${selectedRange}`);
-                    console.log(latestTempResponse.data, `/api/light/${selectedRange}`, "/api/light/1");
                     const transformedData = latestTempResponse.data.map(item => ({
                         ...item,
                         working_time_seconds: item.working_time_seconds / 60
@@ -112,9 +204,6 @@ export default function Dashboard() {
         };
 
         const activeItem = data[activeIndex];
-
-        // Debugging
-        console.log("Data:", data);
 
         return (
             <div style={{ width: '100%' }}>
@@ -146,7 +235,6 @@ export default function Dashboard() {
         const renderChartActive = async () => {
 
         };
-        console.log("Change to: ", selectedRange)
         renderChartActive();
     }, [selectedRange]);
     return (
@@ -181,7 +269,7 @@ export default function Dashboard() {
                             <Example selectedRange={selectedRange} />
                         </div>
                         <div style={{ width: '45%' }}>
-                            <ChartOfTemp />
+                            <ChartO />
                         </div>
                     </Container>
                     <Container className="d-flex mt-5">

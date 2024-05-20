@@ -5,7 +5,7 @@ import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap"
 import LightImg from '../asserts/Đèn.jpg'
 import LightOn from '../asserts/light-on.png'
 import LightOff from '../asserts/light-off.png'
-import ActivityHistory from '../components/ActivityHistory'
+import ActivityHistory from '../components/LightActivityHistory'
 import LightSchedule from "../components/LightSchedule"
 import api from '../api'
 

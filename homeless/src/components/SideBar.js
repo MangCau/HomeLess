@@ -35,7 +35,7 @@ export default function SideBar() {
                 <SideBarItem img_src={dashboardImage} des="Dashboard" to="/dashboard" /><br></br>
                 <SideBarItem img_src={fanImage} des="Quạt" to="/fan" /><br></br>
                 <SideBarItem img_src={lightImage} des="Đèn" to="/light" /><br></br>
-                <SideBarItem img_src={settingImage} des="Cài đặt" to="/setting" /><br></br>
+                <SideBarItem img_src={settingImage} des="Cảm biến" to="/sencor" /><br></br>
                 <SideBarItem img_src={signoutImage} des="Đăng xuất" to="/logout" /><br></br>
                 <Advertisement />
             </div>
