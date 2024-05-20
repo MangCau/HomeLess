@@ -10,6 +10,7 @@ from .models import SensorRecord, Light, Fan, FanLog, LightLog, Schedule, FanAut
 from .serializers import SensorRecordSerializer, LightSerializer, FanSerializer, FanLogSerializer, LightLogSerializer, ScheduleSerializer, FanAutoLogSerializer, FanThresholdLogSerializer
 from collections import defaultdict
 from django.utils import timezone
+from django.db.models import Sum
 
 io_key = "aio_xYUK42K323uMXE3gfamwQCGw1nTB" 
 
@@ -39,7 +40,6 @@ class SensorRecordView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        # Define the URLs for fetching sensor data
         urls = [
             "https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-nhiet-do/data?start_time=today",
             "https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-do-am/data?start_time=today",
@@ -51,7 +51,6 @@ class SensorRecordView(APIView):
             if response.status_code == 200:
                 sensor_data = response.json()
                 
-                # Create a Record for each data point
                 for data in sensor_data:
                     if not SensorRecord.objects.filter(id=data['id']).exists():
                         if data['feed_key'] == "canh-bao":
@@ -122,11 +121,9 @@ class FanView(APIView):
     
     def patch(self, request, format=None):
         fan = Fan.objects.first() 
-        # Extract the fields to update from the request data
         status = request.data.get('status')
         is_manual = request.data.get('is_manual')
         threshold = request.data.get('threshold')
-        # Update the corresponding fields based on what's provided in the request
         if status is not None:
             fan.status = status 
             feed_url = "https://io.adafruit.com/api/v2/homeless_da01/feeds/cong-tac-quat/data"
@@ -306,56 +303,45 @@ class FanWorkingTime(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, day):
-        # Calculate the start date based on the 'day' parameter and make it timezone-aware (UTC)
         utc = pytz.UTC
         start_date = datetime.utcnow() - timedelta(days=day)
         start_date = utc.localize(start_date)
 
-        # Get logs from both FanLog and FanAutoLog within the specified date range
         fan_logs = FanLog.objects.filter(timestamp__gte=start_date).order_by('timestamp')
         fan_auto_logs = FanAutoLog.objects.filter(timestamp__gte=start_date).order_by('timestamp')
         
-        # Merge logs
         merged_logs = sorted(
             list(fan_logs) + list(fan_auto_logs),
             key=lambda log: log.timestamp
         )
         
-        # Calculate working time for each day
         working_times = defaultdict(float)
         current_status = None
         current_start_time = None
 
         for log in merged_logs:
-            # Ensure the log timestamp is timezone-aware
             if log.timestamp.tzinfo is None:
                 log.timestamp = utc.localize(log.timestamp)
 
-            # Determine if it's a status change
             if isinstance(log, FanLog):
                 if current_status is None or current_status != log.status:
                     if current_status:
-                        # Calculate the duration the fan was on
                         working_times[current_start_time.date()] += (log.timestamp - current_start_time).total_seconds()
                     current_status = log.status
                     if log.status:
                         current_start_time = log.timestamp
             elif isinstance(log, FanAutoLog):
-                # Assume the same handling for auto logs (is_manual considered)
                 if current_status is None or current_status != log.is_manual:
                     if current_status:
-                        # Calculate the duration the fan was on
                         working_times[current_start_time.date()] += (log.timestamp - current_start_time).total_seconds()
                     current_status = log.is_manual
                     if log.is_manual:
                         current_start_time = log.timestamp
 
-        # If the fan is still on, account for the current period until now
         if current_status:
             now_utc = timezone.now()
             working_times[current_start_time.date()] += (now_utc - current_start_time).total_seconds()
 
-        # Convert the working times to a list of dictionaries
         working_time_list = [
             {'date': date.strftime('%Y-%m-%d'), 'working_time_seconds': working_time}
             for date, working_time in sorted(working_times.items())
@@ -367,39 +353,31 @@ class LightWorkingTime(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, day):
-        # Calculate the start date based on the 'day' parameter and make it timezone-aware (UTC)
         utc = pytz.UTC
         start_date = datetime.utcnow() - timedelta(days=day)
         start_date = utc.localize(start_date)
 
-        # Get logs from LightLog within the specified date range
         light_logs = LightLog.objects.filter(timestamp__gte=start_date).order_by('timestamp')
         
-        # Calculate working time for each day
         working_times = defaultdict(float)
         current_status = None
         current_start_time = None
 
         for log in light_logs:
-            # Ensure the log timestamp is timezone-aware
             if log.timestamp.tzinfo is None:
                 log.timestamp = utc.localize(log.timestamp)
 
-            # Determine if it's a status change
             if current_status is None or current_status != log.status:
                 if current_status:
-                    # Calculate the duration the light was on
                     working_times[current_start_time.date()] += (log.timestamp - current_start_time).total_seconds()
                 current_status = log.status
                 if log.status:
                     current_start_time = log.timestamp
 
-        # If the light is still on, account for the current period until now
         if current_status:
             now_utc = timezone.now()
             working_times[current_start_time.date()] += (now_utc - current_start_time).total_seconds()
 
-        # Convert the working times to a list of dictionaries
         working_time_list = [
             {'date': date.strftime('%Y-%m-%d'), 'working_time_seconds': working_time}
             for date, working_time in sorted(working_times.items())
@@ -411,23 +389,19 @@ class GetFanLog(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, day):
-        # Calculate the start date based on the 'day' parameter and make it timezone-aware (UTC)
         utc = pytz.UTC
         start_date = datetime.utcnow() - timedelta(days=day)
         start_date = utc.localize(start_date)
 
-        # Get logs from FanLog and FanAutoLog within the specified date range
         fan_logs = FanLog.objects.filter(timestamp__gte=start_date)
         fan_auto_logs = FanAutoLog.objects.filter(timestamp__gte=start_date)
 
-        # Combine and sort logs by timestamp
         combined_logs = sorted(
             list(fan_logs) + list(fan_auto_logs),
             key=lambda log: log.timestamp,
             reverse=True
         )
 
-        # Serialize combined logs
         serialized_logs = []
         for log in combined_logs:
             if isinstance(log, FanLog):
@@ -457,3 +431,109 @@ class AddSchedule(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class Chart1(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, day):
+        utc = pytz.UTC
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=day)
+        start_date = utc.localize(start_date)
+        end_date = utc.localize(end_date)
+
+        sensor_records = SensorRecord.objects.filter(
+            timestamp__gte=start_date,
+            timestamp__lte=end_date,
+            sensor='canh-bao'
+        )
+
+        detection_sums = sensor_records.extra({
+            'date': "DATE(timestamp)"
+        }).values('date').annotate(sum=Sum('value')).order_by('date')
+
+        detection_dict = {detection['date']: detection['sum'] for detection in detection_sums}
+
+        current_date = start_date.date()
+        results = []
+
+        while current_date <= end_date.date():
+            if current_date in detection_dict:
+                detection_count = detection_dict[current_date]
+            else:
+                detection_count = 0
+            results.append({
+                'date': current_date.strftime('%Y-%m-%d'),
+                'detection_count': detection_count,
+            })
+            current_date += timedelta(days=1)
+
+        return Response(results)
+    
+class Chart2(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, day):
+        utc = pytz.UTC
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=day)
+        start_date = utc.localize(start_date)
+        end_date = utc.localize(end_date)
+
+        sensor_records = SensorRecord.objects.filter(
+            timestamp__gte=start_date,
+            timestamp__lte=end_date,
+            sensor__in=['cam-bien-nhiet-do', 'cam-bien-do-am']
+        )
+
+        last_temp_record = SensorRecord.objects.filter(
+            timestamp__lt=start_date,
+            sensor='cam-bien-nhiet-do'
+        ).order_by('-timestamp').first()
+
+        last_humidity_record = SensorRecord.objects.filter(
+            timestamp__lt=start_date,
+            sensor='cam-bien-do-am'
+        ).order_by('-timestamp').first()
+
+        temp_sums = defaultdict(float)
+        temp_counts = defaultdict(int)
+        humidity_sums = defaultdict(float)
+        humidity_counts = defaultdict(int)
+
+        for record in sensor_records:
+            date = record.timestamp.date()
+            if record.sensor == 'cam-bien-nhiet-do':
+                temp_sums[date] += record.value
+                temp_counts[date] += 1
+            elif record.sensor == 'cam-bien-do-am':
+                humidity_sums[date] += record.value
+                humidity_counts[date] += 1
+
+        current_date = start_date.date()
+        results = []
+        last_mean_temp = last_temp_record.value if last_temp_record else None
+        last_mean_humidity = last_humidity_record.value if last_humidity_record else None
+
+        while current_date <= end_date.date():
+            if temp_counts[current_date] > 0:
+                mean_temp = temp_sums[current_date] / temp_counts[current_date]
+                last_mean_temp = mean_temp
+            else:
+                mean_temp = last_mean_temp
+
+            if humidity_counts[current_date] > 0:
+                mean_humidity = humidity_sums[current_date] / humidity_counts[current_date]
+                last_mean_humidity = mean_humidity
+            else:
+                mean_humidity = last_mean_humidity
+
+            results.append({
+                'date': current_date.strftime('%Y-%m-%d'),
+                'mean_temp': mean_temp,
+                'mean_humidity': mean_humidity,
+            })
+
+            current_date += timedelta(days=1)
+
+        return Response(results)
