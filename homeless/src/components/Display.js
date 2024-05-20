@@ -63,7 +63,7 @@ function MyTable() {
 }
 export function DeviceStatistics() {
     return (
-        <div className="mt-5 m-4 bg-white p-4 pb-0" style={{ minWidth: "45%" }}>
+        <div className="mt-0 m-4 bg-white p-4 pb-0" style={{ minWidth: "45%" }}>
             <div className="d-flex justify-content-between align-items-center">
                 <div>
                     <h4>Thiết bị hiện tại</h4>
@@ -99,7 +99,7 @@ export default function Display() {
     }, []) 
 
     return (
-        <div className="mt-5  m-4 bg-white p-4 pb-0 mw-50 me-0" style={{ minWidth: "45%" }}>
+        <div className="mt-0  m-4 bg-white p-4 pb-0 mw-50 me-0" style={{ minWidth: "45%" }}>
             <div className="d-flex justify-content-between align-items-center">
                 <div>
                     <h4>Thông tin hôm nay</h4>
