@@ -58,15 +58,8 @@ const Header = () => {
                 <Navbar className="bg-white">
                     <Container>
                         <Navbar.Brand href="#">
-                            <img
-                                alt="Logo"
-                                src={ava}
-                                width="50"
-                                height="50"
-                                className="d-inline-block align-center"
-                            />
-                            {' '}
-                            ChaNa
+                            
+                        
                         </Navbar.Brand>
                     </Container>
                 </Navbar>

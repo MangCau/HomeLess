@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import Button from 'react-bootstrap/Button'
+import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap"
 import api from "../api"
 
 function SmallItems({ type, color, value }) {
@@ -13,7 +13,165 @@ function SmallItems({ type, color, value }) {
         </div>
     )
 }
+const OnOffFan = () => {
+    const [status, setStatus] = useState('')
+    const [auto, setAuto] = useState('')
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          await api.get("/api/fan-log/")
+          const lastRecordStatus = await api.get('/api/fan/')
+          setStatus(lastRecordStatus.data['status'])
+          setAuto(lastRecordStatus.data['is_manual'])
+        } catch (error) {
+          console.error('Error fetching data:', error)
+        }
+      }
+  
+      fetchData()
+    }, [])
+  
+    const handleStatusChange = async () => {
+      try {
+        const { v4: uuidv4 } = require('uuid')
+        const activityResponse = await api.post('/api/fan-log/', {
+          id: uuidv4(),
+          status: !status,
+          log_type: 'status',
+        })
+        await api.patch('/api/fan/', { status: !status })
+        console.log(activityResponse.data)
+      } catch (error) {
+        console.error('Error toggling status:', error)
+      }
+      setStatus(prevStatus => !prevStatus)
+    }
+  
+    const handleAutoChange = async () => {
+      try {
+        const { v4: uuidv4 } = require('uuid')
+        const fanAutoLogResponse = await api.post('/api/fan-log/', {
+          id: uuidv4(),
+          is_manual: !auto,
+          log_type: 'auto',
+        })
+        await api.patch('/api/fan/', { is_manual: !auto })
+        console.log(fanAutoLogResponse.data)
+      } catch (error) {
+        console.error('Error toggling auto status:', error)
+      }
+      setAuto(prevStatus => !prevStatus)
+    }
+    
+    return (
+        <Form.Group className="mb-3">
+          <Form.Label className="d-flex justify-content-between align-content-center">
+            
+            <span>
+              <Form.Check 
+                type="switch"
+                id="status-switch-fan"
+                checked={status}
+                onChange={handleStatusChange}
+              />
+            </span>
+          </Form.Label>
+        </Form.Group>
+    )
+  }
 function MyTable() {
+    const [status, setStatus] = useState('')
+    const [showModal, setShowModal] = useState(false)
+    const [startTime, setStartTime] = useState('')
+    const [endTime, setEndTime] = useState('')
+    const [schedules, setSchedules] = useState([])
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await fetchLightStatus()
+                await fetchSchedules()
+            } catch (error) {
+                console.error('Error fetching data:', error)
+            }
+        }
+        fetchData()
+        const checkScheduleAndUpdateLight = () => {
+            const currentTime = new Date()
+            for (const schedule of schedules) {
+                const startTimeParts = schedule.start_time.split(':')
+                const endTimeParts = schedule.end_time.split(':')
+                const startTime = new Date()
+                startTime.setHours(startTimeParts[0], startTimeParts[1], startTimeParts[2] || 0, 0)
+                const endTime = new Date()
+                endTime.setHours(endTimeParts[0], endTimeParts[1], endTimeParts[2] || 0, 0)
+                console.log(currentTime >= startTime && currentTime <= endTime)
+                    if (currentTime >= startTime && currentTime <= endTime) {
+                    if (!status) turnOnLight()
+                    return 
+                }
+            }
+        
+            if (status) turnOffLight()
+        }
+        const intervalId = setInterval(checkScheduleAndUpdateLight, 1000)
+        return () => clearInterval(intervalId)
+    }, [status])
+    const turnOnLight = async () => {
+        try {
+            const { v4: uuidv4 } = require('uuid')
+            await api.post('/api/light-log/', {
+                id: uuidv4(),
+                status: true
+            })
+            setStatus(true)
+        } catch (error) {
+            console.error('Error turning on light:', error)
+        }
+    }
+    const fetchSchedules = async () => {
+        try {
+            const response = await api.get("/api/schedule/")
+            setSchedules(response.data)
+        } catch (error) {
+            console.error('Error fetching schedules:', error)
+        }
+    }
+    const turnOffLight = async () => {
+        try {
+            const { v4: uuidv4 } = require('uuid')
+            await api.post('/api/light-log/', {
+                id: uuidv4(),
+                status: false
+            })
+            setStatus(false)
+        } catch (error) {
+            console.error('Error turning off light:', error)
+        }
+    }
+    
+
+    const fetchLightStatus = async () => {
+        try {
+            const lastRecordStatus = await api.get('/api/light/')
+            setStatus(lastRecordStatus.data['status'])
+        } catch (error) {
+            console.error('Error fetching light status:', error)
+        }
+    }
+    const handleStatusChange = async () => {
+        try {
+            const { v4: uuidv4 } = require('uuid')
+            const newStatus = !status
+            await api.post('/api/light-log/', {
+                id: uuidv4(),
+                status: newStatus
+            })
+            setStatus(prevStatus => !prevStatus)
+        } catch (error) {
+            console.error('Error toggling light status:', error)
+        }
+    }
     return (
         <div className="container-fluid">
             <div className="row">
@@ -30,7 +188,7 @@ function MyTable() {
                                 <tr>
                                     <th style={{ textDecoration: 'none', color: 'gray' }}>#</th>
                                     <th style={{ textDecoration: 'none', color: 'gray' }}>Name</th>
-                                    <th style={{ textDecoration: 'none', color: 'gray' }}>Config</th>
+                                   
                                     <th style={{ textDecoration: 'none', color: 'gray' }}> Status</th>
                                 </tr>
                             </thead>
@@ -38,19 +196,28 @@ function MyTable() {
                                 <tr>
                                     <td>1</td>
                                     <td>Đèn</td>
-                                    <td>Config 1</td>
+                                    
                                     <td>
-                                        {/* <button className="btn btn-outline-success">On</button> */}
-                                        <button className="btn btn-outline-danger">Off</button>
+                                    <Form.Label className="d-flex justify-content-between align-content-center">
+                                            
+                                            <span>
+                                                <Form.Check
+                                                    type="switch"
+                                                    id="status-switch-light"
+                                                    checked={status}
+                                                    onChange={handleStatusChange}
+                                                />
+                                            </span>
+                                        </Form.Label>
+                                        
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>2</td>
                                     <td>Quạt</td>
-                                    <td>Config 2</td>
+                                    
                                     <td>
-                                        <button className="btn btn-outline-success">On</button>
-                                        {/* <button className="btn btn-outline-danger">Off</button> */}
+                                        <OnOffFan/>
                                     </td>
                                 </tr>
                             </tbody>
