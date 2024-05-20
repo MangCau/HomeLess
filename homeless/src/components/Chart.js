@@ -1,7 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-
-const Example = () => {
+import api from "../api"
+const Example = ({ selectedRange }) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await api.get("/api/record")
+        const history = await api.get("/api/temperature-record/latest/")
+      } catch (error) {
+        console.error('Error fetching data:', error)
+      }
+    }
+    fetchData()
+    const intervalId = setInterval(fetchData, 1000)
+    return () => clearInterval(intervalId)
+  }, [])
   const [data, setData] = useState([
     {
       name: 'Page A',

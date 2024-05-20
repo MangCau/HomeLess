@@ -74,7 +74,7 @@ export function DeviceStatistics() {
     )
 }
 
-export default function Display() {
+export default function Display({ selectedRange }) {
     const [temperature, setTemperature] = useState('')
     const [humidity, setHumidity] = useState('')
     const [detectHuman, setDetectHuman] = useState('')
