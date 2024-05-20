@@ -12,7 +12,7 @@ from collections import defaultdict
 from django.utils import timezone
 from django.db.models import Sum
 
-io_key = "aio_xYUK42K323uMXE3gfamwQCGw1nTB" 
+io_key = "aio_bFtQ450kcjBUtmlZNJev3QoVqrC0" 
 
 class LatestTemperature(APIView):
     permission_classes = [AllowAny]
@@ -44,6 +44,7 @@ class SensorRecordView(APIView):
             "https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-nhiet-do/data?start_time=today",
             "https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-do-am/data?start_time=today",
             "https://io.adafruit.com/api/v2/homeless_da01/feeds/canh-bao/data?start_time=today",
+            "https://io.adafruit.com/api/v2/homeless_da01/feeds/cam-bien-khoang-cach/data?start_time=yesterday",
         ]
 
         for url in urls:
@@ -536,3 +537,12 @@ class Chart2(APIView):
             current_date += timedelta(days=1)
 
         return Response(results)
+
+class DistantRecordView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        records = SensorRecord.objects.all()
+        serializer = SensorRecordSerializer(records, many=True)
+        return Response(serializer.data)
+    

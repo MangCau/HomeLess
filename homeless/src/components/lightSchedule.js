@@ -26,6 +26,7 @@ export default function LightSchedule() {
                 await api.post("/api/schedule/", { "id": id });
                 setSchedules(schedules.filter(schedule => schedule.id !== id));
                 alert('Schedule deleted successfully.');
+                window.location.reload();
             } catch (error) {
                 console.error('Error deleting schedule:', error);
                 alert('Failed to delete the schedule. Please try again.');
