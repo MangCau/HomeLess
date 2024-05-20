@@ -109,7 +109,15 @@ export default function LightController() {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
+
+        const startTimeDate = new Date(`1970-01-01T${startTime}:00`);
+        const endTimeDate = new Date(`1970-01-01T${endTime}:00`);
+        
+        if (startTimeDate >= endTimeDate) {
+            window.alert('Thời gian biểu không đúng');
+            return;
+        }
         if (checkScheduleConflicts({ startTime, endTime })) {
             window.alert('Thời gian biểu trùng lặp!')
             return
