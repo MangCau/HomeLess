@@ -18,4 +18,6 @@ urlpatterns = [
     path('light-log/<int:day>/', views.GetLightLog.as_view()),
     path('schedule/', views.ScheduleView.as_view()),
     path('add-schedule/', views.AddSchedule.as_view()),
+    path('chart1/<int:day>', views.Chart1.as_view()),
+    path('chart2/<int:day>', views.Chart2.as_view()),
 ]
