@@ -9,7 +9,8 @@ function LightActivityHistory() {
     const [temperatureLog, setTemperatureLog] = useState([]);
     const [humidityLog, setHumidityLog] = useState([]);
     const [alertLog, setAlertLog] = useState([]);
-    const [day, setDay] = useState('1'); // Default to 'all'
+    const [distanceLog, setDistanceLog] = useState([]);
+    const [day, setDay] = useState('1'); 
 
     useEffect(() => {
         fetchData(day);
@@ -24,7 +25,8 @@ function LightActivityHistory() {
         const groupedData = {
             temperature: {},
             humidity: {},
-            alert: {}
+            alert: {},
+            distance: {},
         };
 
         logData.forEach(logEntry => {
@@ -48,7 +50,14 @@ function LightActivityHistory() {
                     if (!groupedData.alert[date]) {
                         groupedData.alert[date] = [];
                     }
-                    groupedData.alert[date].push({ time, value: logEntry.value });
+                    const alertValue = logEntry.value === 1 ? 'Có người' : 'Không có người';
+                    groupedData.alert[date].push({ time, value: alertValue });
+                    break;
+                case 'cam-bien-khoang-cach':
+                    if (!groupedData.distance[date]) {
+                        groupedData.distance[date] = [];
+                    }
+                    groupedData.distance[date].push({ time, value: logEntry.value });
                     break;
                 default:
                     break;
@@ -70,6 +79,7 @@ function LightActivityHistory() {
             setTemperatureLog(processedData.temperature);
             setHumidityLog(processedData.humidity);
             setAlertLog(processedData.alert);
+            setDistanceLog(processedData.distance);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -134,7 +144,8 @@ function LightActivityHistory() {
             </Form>
             {renderTable(temperatureLog, 'Cảm biến nhiệt độ', 'độ C')}
             {renderTable(humidityLog, 'Cảm biến độ ẩm', '%')}
-            {renderTable(alertLog, 'Cảnh báo', '1/0')}
+            {renderTable(distanceLog, 'Cảm biến khoảng cách', 'cm')}
+            {renderTable(alertLog, 'Cảnh báo', 'Có/Không')}
         </Container>
     );
 }
