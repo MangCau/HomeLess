@@ -89,34 +89,42 @@ function MyTable() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                await fetchLightStatus()
-                await fetchSchedules()
+                await fetchLightStatus();
+                await fetchSchedules();
             } catch (error) {
-                console.error('Error fetching data:', error)
+                console.error('Error fetching data:', error);
             }
-        }
-        fetchData()
+        };
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        if (schedules.length === 0) return;
+        
         const checkScheduleAndUpdateLight = () => {
-            const currentTime = new Date()
+            const currentTime = new Date();
             for (const schedule of schedules) {
-                const startTimeParts = schedule.start_time.split(':')
-                const endTimeParts = schedule.end_time.split(':')
-                const startTime = new Date()
-                startTime.setHours(startTimeParts[0], startTimeParts[1], startTimeParts[2] || 0, 0)
-                const endTime = new Date()
-                endTime.setHours(endTimeParts[0], endTimeParts[1], endTimeParts[2] || 0, 0)
-                console.log(currentTime >= startTime && currentTime <= endTime)
-                    if (currentTime >= startTime && currentTime <= endTime) {
-                    if (!status) turnOnLight()
-                    return 
+                const startTimeParts = schedule.start_time.split(':');
+                const endTimeParts = schedule.end_time.split(':');
+                const startTime = new Date();
+                startTime.setHours(startTimeParts[0], startTimeParts[1], startTimeParts[2] || 0, 0);
+                const endTime = new Date();
+                endTime.setHours(endTimeParts[0], endTimeParts[1], endTimeParts[2] || 0, 0);
+                
+                if (currentTime >= startTime && currentTime <= endTime) {
+                    if (!status) turnOnLight();
+                    return;
                 }
             }
+
+            if (status) turnOffLight();
+        };
         
-            if (status) turnOffLight()
-        }
-        const intervalId = setInterval(checkScheduleAndUpdateLight, 1000)
-        return () => clearInterval(intervalId)
-    }, [status])
+        const intervalId = setInterval(checkScheduleAndUpdateLight, 1000);
+        return () => clearInterval(intervalId);
+    }, [status, schedules]);
+    
+    
     const turnOnLight = async () => {
         try {
             const { v4: uuidv4 } = require('uuid')
@@ -124,19 +132,13 @@ function MyTable() {
                 id: uuidv4(),
                 status: true
             })
+            await api.patch('/api/light/', { status: true })
             setStatus(true)
         } catch (error) {
             console.error('Error turning on light:', error)
         }
     }
-    const fetchSchedules = async () => {
-        try {
-            const response = await api.get("/api/schedule/")
-            setSchedules(response.data)
-        } catch (error) {
-            console.error('Error fetching schedules:', error)
-        }
-    }
+    
     const turnOffLight = async () => {
         try {
             const { v4: uuidv4 } = require('uuid')
@@ -144,6 +146,7 @@ function MyTable() {
                 id: uuidv4(),
                 status: false
             })
+            await api.patch('/api/light/', { status: false })
             setStatus(false)
         } catch (error) {
             console.error('Error turning off light:', error)
@@ -153,12 +156,23 @@ function MyTable() {
 
     const fetchLightStatus = async () => {
         try {
+            await api.get("/api/light-log/")
             const lastRecordStatus = await api.get('/api/light/')
             setStatus(lastRecordStatus.data['status'])
         } catch (error) {
             console.error('Error fetching light status:', error)
         }
     }
+
+    const fetchSchedules = async () => {
+        try {
+            const response = await api.get("/api/schedule/")
+            setSchedules(response.data)
+        } catch (error) {
+            console.error('Error fetching schedules:', error)
+        }
+    }
+
     const handleStatusChange = async () => {
         try {
             const { v4: uuidv4 } = require('uuid')
@@ -167,7 +181,8 @@ function MyTable() {
                 id: uuidv4(),
                 status: newStatus
             })
-            setStatus(prevStatus => !prevStatus)
+            await api.patch('/api/light/', { status: newStatus })
+            setStatus(newStatus)
         } catch (error) {
             console.error('Error toggling light status:', error)
         }
